@@ -1,0 +1,8 @@
+numpy
+soundcard
+openai-whisper
+torch
+wave
+pyaudio
+openai
+customtkinter
