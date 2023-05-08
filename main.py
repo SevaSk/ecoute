@@ -1,7 +1,7 @@
 # pyinstaller --onedir --add-data "C:/Users/mcfar/AppData/Local/Programs/Python/Python310/Lib/site-packages/customtkinter;customtkinter/" --noconfirm --windowed --noconsole main.py
 
 import threading
-from audio_transcriber import AudioTranscriber, TRANSCRIPT_LIMIT
+from AudioTranscriber import AudioTranscriber, TRANSCRIPT_LIMIT
 from gpt_responder import GPTResponder
 import customtkinter as ctk
 from Microphone import Microphone
@@ -23,13 +23,11 @@ def create_transcript_string(transcriber_mic, transcriber_speaker, reverse = Tru
         transcript_string += source + ": [" + line['utterance'] + ']\n\n'
     return transcript_string
 
-def update_transcript_UI(transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, textbox, mic_transcription_status_label, speaker_transcription_status_label):
+def update_transcript_UI(transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, textbox):
     transcript_string = create_transcript_string(transcriber_mic, transcriber_speaker, reverse=True)
     textbox.delete("0.0", "end")
     textbox.insert("0.0", transcript_string)
-    mic_transcription_status_label.configure(text=f"Mic transcription status: {transcriber_mic.status}")
-    speaker_transcription_status_label.configure(text=f"Speaker transcription status: {transcriber_speaker.status}")
-    textbox.after(200, update_transcript_UI, transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, textbox, mic_transcription_status_label, speaker_transcription_status_label)
+    textbox.after(200, update_transcript_UI, transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, textbox)
 
 def update_response_UI(transcriber_mic, transcriber_speaker, responder, textbox, update_interval_slider_label, update_interval_slider):
     transcript_string = create_transcript_string(transcriber_mic, transcriber_speaker,reverse=False)
@@ -92,12 +90,6 @@ if __name__ == "__main__":
     recorder_thread_speaker.start()
     transcriber_thread_speaker.start()
 
-    # Create status label for both transcribers
-    mic_transcription_status_label = ctk.CTkLabel(root, text=f"Mic transcription status: {transcriber_mic.status}", font=("Arial", 12), text_color="#FFFCF2")
-    mic_transcription_status_label.grid(row=4, column=0, padx=5, pady=5, sticky="nsew")
-    speaker_transcription_status_label = ctk.CTkLabel(root, text=f"Speaker transcription status: {transcriber_speaker.status}", font=("Arial", 12), text_color="#FFFCF2")
-    speaker_transcription_status_label.grid(row=4, column=1, padx=5, pady=5, sticky="nsew")
-
     root.grid_rowconfigure(0, weight=100)
     root.grid_rowconfigure(1, weight=10)
     root.grid_rowconfigure(2, weight=1)
@@ -106,7 +98,7 @@ if __name__ == "__main__":
     root.grid_columnconfigure(0, weight=2)
     root.grid_columnconfigure(1, weight=1)
 
-    update_transcript_UI(transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, transcript_textbox, mic_transcription_status_label, speaker_transcription_status_label)
+    update_transcript_UI(transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, transcript_textbox)
     update_response_UI(transcriber_mic, transcriber_speaker, responder, response_textbox, update_interval_slider_label, update_interval_slider)
 
     root.mainloop()

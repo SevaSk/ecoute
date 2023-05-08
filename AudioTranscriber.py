@@ -16,12 +16,11 @@ RECORDING_TIME = 5
 class AudioTranscriber:
     def __init__(self, lang: str, microphone : Microphone):
         self.audio_np_array_queue = queue.Queue()
-        self.status = 'Running'
         self.transcript_data = []
         self.microphone = microphone
         self.lang = lang
         self.lock = threading.Lock()
-        self.start_time = time.time()  # Record the start time
+
         parser = argparse.ArgumentParser()
         parser.add_argument("--model", default="tiny", help="Model to use",
                             choices=["tiny", "base", "small", "medium", "large"])
