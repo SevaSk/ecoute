@@ -1,5 +1,4 @@
 import numpy as np
-import soundcard as sc
 import whisper
 import torch
 import wave
@@ -18,7 +17,6 @@ class AudioTranscriber:
             audio_data = (audio_data * (2**15 - 1)).astype(np.int16)
             wav_file.writeframes(audio_data.tobytes())
         result = self.audio_model.transcribe(f'temp_{id(self)}.wav', fp16=torch.cuda.is_available())
-        print(torch.cuda.is_available())
         text = result['text'].strip()
         return text
     

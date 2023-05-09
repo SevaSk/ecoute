@@ -1,7 +1,6 @@
 import openai
 from keys import OPENAI_API_KEY
 from prompts import create_prompt, INITIAL_RESPONSE
-import time
 
 openai.api_key = OPENAI_API_KEY
 
