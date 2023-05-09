@@ -1,38 +1,24 @@
-# pyinstaller --onedir --add-data "C:/Users/mcfar/AppData/Local/Programs/Python/Python310/Lib/site-packages/customtkinter;customtkinter/" --noconfirm --windowed --noconsole main.py
-
+import soundcard as sc
 import threading
-from AudioTranscriber import AudioTranscriber, TRANSCRIPT_LIMIT
-from gpt_responder import GPTResponder
+from AudioTranscriber import AudioTranscriber
+from GPTResponder import GPTResponder
 import customtkinter as ctk
 from Microphone import Microphone
-import soundcard as sc
+from AudioRecorder import AudioRecorder
+import queue
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
     textbox.insert("0.0", text)
 
-#TODO make fast leetcode :)
-def create_transcript_string(transcriber_mic, transcriber_speaker, reverse = True):
-    transcript_string = ""
-
-    mic_transcript = transcriber_mic.get_transcript()
-    speaker_transcript = transcriber_speaker.get_transcript()
-    total_transcript = [('You', data) for data in mic_transcript] + [('Speaker', data) for data in speaker_transcript]
-    sorted_transcript = sorted(total_transcript, key = lambda x: x[1]['timestamp'], reverse = reverse)
-    for source, line in sorted_transcript[:TRANSCRIPT_LIMIT]:
-        transcript_string += source + ": [" + line['utterance'] + ']\n\n'
-    return transcript_string
-
-def update_transcript_UI(transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, textbox):
-    transcript_string = create_transcript_string(transcriber_mic, transcriber_speaker, reverse=True)
+def update_transcript_UI(transcriber, textbox):
+    transcript_string = transcriber.get_transcript()
     textbox.delete("0.0", "end")
     textbox.insert("0.0", transcript_string)
-    textbox.after(200, update_transcript_UI, transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, textbox)
+    textbox.after(300, update_transcript_UI, transcriber, textbox)
 
 def update_response_UI(transcriber_mic, transcriber_speaker, responder, textbox, update_interval_slider_label, update_interval_slider):
-    transcript_string = create_transcript_string(transcriber_mic, transcriber_speaker,reverse=False)
-    t = threading.Thread(target=lambda: responder.generate_response_from_transcript(transcript_string))
-    t.start()
+    #transcript_string = create_transcript_string(transcriber_mic, transcriber_speaker,reverse=False)
     textbox.configure(state="normal")
     textbox.delete("0.0", "end")
     textbox.insert("0.0", responder.last_response)
@@ -61,7 +47,7 @@ if __name__ == "__main__":
     response_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="nsew")
 
      # Add the clear transcript button to the UI
-    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_transcript_data(transcriber_mic, transcriber_speaker))
+    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_transcript_data(user_transcriber, transcriber_speaker))
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
     # empty label, necessary for proper grid spacing
     update_interval_slider_label = ctk.CTkLabel(root, text=f"", font=("Arial", 12), text_color="#FFFCF2")
@@ -74,21 +60,23 @@ if __name__ == "__main__":
     update_interval_slider_label = ctk.CTkLabel(root, text=f"Update interval: {update_interval_slider.get()} seconds", font=("Arial", 12), text_color="#FFFCF2")
     update_interval_slider_label.grid(row=2, column=1, padx=10, pady=10, sticky="nsew")
 
-    responder = GPTResponder()
+    audio_queue = queue.Queue()
 
     user_mirophone = Microphone(str(sc.default_microphone().name), False)
-    transcriber_mic = AudioTranscriber(lang='en-US', microphone=user_mirophone)
-    recorder_thread_mic = threading.Thread(target=transcriber_mic.record_into_queue)
-    transcriber_thread_mic = threading.Thread(target=transcriber_mic.transcribe_from_queue)
-    recorder_thread_mic.start()
-    transcriber_thread_mic.start()
+    user_audio_recorder = AudioRecorder(user_mirophone)
+
+    record_user = threading.Thread(target=user_audio_recorder.record_into_queue, args=(audio_queue, "You",))
+    record_user.start()
 
     speaker_mirophone = Microphone(str(sc.default_speaker().name), True)
-    transcriber_speaker = AudioTranscriber(lang='en-US', microphone=speaker_mirophone)
-    recorder_thread_speaker = threading.Thread(target=transcriber_speaker.record_into_queue)
-    transcriber_thread_speaker = threading.Thread(target=transcriber_speaker.transcribe_from_queue)
-    recorder_thread_speaker.start()
-    transcriber_thread_speaker.start()
+    speaker_audio_recorder = AudioRecorder(speaker_mirophone)
+
+    record_speaker = threading.Thread(target=speaker_audio_recorder.record_into_queue, args=(audio_queue, "Speaker",))
+    record_speaker.start()
+
+    global_transcriber = AudioTranscriber()
+    transcribe = threading.Thread(target=global_transcriber.create_transcription_from_queue, args=(audio_queue,))
+    transcribe.start()
 
     root.grid_rowconfigure(0, weight=100)
     root.grid_rowconfigure(1, weight=10)
@@ -98,10 +86,7 @@ if __name__ == "__main__":
     root.grid_columnconfigure(0, weight=2)
     root.grid_columnconfigure(1, weight=1)
 
-    update_transcript_UI(transcriber_mic, transcriber_thread_mic, transcriber_speaker, transcriber_thread_speaker, transcript_textbox)
-    update_response_UI(transcriber_mic, transcriber_speaker, responder, response_textbox, update_interval_slider_label, update_interval_slider)
+    update_transcript_UI(global_transcriber, transcript_textbox)
+    #update_response_UI(user_transcriber, transcriber_speaker, responder, response_textbox, update_interval_slider_label, update_interval_slider)
 
     root.mainloop()
-
-    transcriber_thread_mic.join()
-    transcriber_thread_speaker.join()
