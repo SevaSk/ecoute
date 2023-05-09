@@ -3,10 +3,12 @@ import whisper
 import torch
 import wave
 import os
+import threading
 
 class AudioTranscriber:
     def __init__(self):
-        self.transcript = []
+        self.transcript_data = []
+        self.transcript_changed_event = threading.Event()
         self.audio_model = whisper.load_model(os.getcwd() + r'\tiny.en' + '.pt')
 
     def transcribe(self, audio_data):
@@ -28,7 +30,8 @@ class AudioTranscriber:
             audio_data_transcription = self.transcribe(audio_data)
             # whisper gives "you" on many null inputs
             if audio_data_transcription != '' and audio_data_transcription.lower() != 'you':
-                self.transcript = [source + ": [" + audio_data_transcription + ']\n\n'] + self.transcript
+                self.transcript_data = [source + ": [" + audio_data_transcription + ']\n\n'] + self.transcript_data
+                self.transcript_changed_event.set()
 
     def get_transcript(self):
-        return "".join(self.transcript)
+        return "".join(self.transcript_data)
