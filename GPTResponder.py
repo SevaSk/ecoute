@@ -30,7 +30,9 @@ class GPTResponder:
                 response = generate_response_from_transcript(transcript_string)
                 if response != '':
                     self.response = response
-            time.sleep(self.response_interval)
+                time.sleep(self.response_interval)
+            else:
+                time.sleep(0.3)
 
     def update_response_interval(self, interval):
         self.response_interval = interval

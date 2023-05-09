@@ -32,9 +32,8 @@ def update_response_UI(responder, textbox, update_interval_slider_label, update_
 
     textbox.after(300, update_response_UI, responder, textbox, update_interval_slider_label, update_interval_slider)
 
-def clear_transcript_data(transcriber_mic, transcriber_speaker):
-    transcriber_mic.transcript_data.clear()
-    transcriber_speaker.transcript_data.clear()
+def clear_transcript_data(transcriber):
+    transcriber.transcript_data.clear()
 
 def clear_temp_files():
     for file in os.listdir():
@@ -58,9 +57,6 @@ if __name__ == "__main__":
     response_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size), text_color='#639cdc', wrap="word")
     response_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="nsew")
 
-     # Add the clear transcript button to the UI
-    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_transcript_data(user_transcriber, transcriber_speaker))
-    clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
     # empty label, necessary for proper grid spacing
     update_interval_slider_label = ctk.CTkLabel(root, text=f"", font=("Arial", 12), text_color="#FFFCF2")
     update_interval_slider_label.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
@@ -101,6 +97,10 @@ if __name__ == "__main__":
     root.grid_rowconfigure(4, weight=1)
     root.grid_columnconfigure(0, weight=2)
     root.grid_columnconfigure(1, weight=1)
+
+     # Add the clear transcript button to the UI
+    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_transcript_data(global_transcriber, ))
+    clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
     update_transcript_UI(global_transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider)
