@@ -7,6 +7,7 @@ from Microphone import Microphone
 import AudioRecorder 
 import queue
 import os
+import time
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
@@ -73,13 +74,18 @@ if __name__ == "__main__":
     user_audio_recorder = AudioRecorder.DefaultMicRecorder()
     user_audio_recorder.record_into_queue(audio_queue)
 
+    time.sleep(2)
+
+    speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
+    speaker_audio_recorder.record_into_queue(audio_queue)
+
     global_transcriber = AudioTranscriber()
     transcribe = threading.Thread(target=global_transcriber.create_transcription_from_queue, args=(audio_queue,))
     transcribe.start()
 
-    responder = GPTResponder()
-    respond = threading.Thread(target=responder.respond_to_transcriber, args=(global_transcriber,))
-    respond.start()
+    #responder = GPTResponder()
+    #respond = threading.Thread(target=responder.respond_to_transcriber, args=(global_transcriber,))
+    #respond.start()
 
     root.grid_rowconfigure(0, weight=100)
     root.grid_rowconfigure(1, weight=10)
@@ -94,6 +100,6 @@ if __name__ == "__main__":
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
     update_transcript_UI(global_transcriber, transcript_textbox)
-    update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider)
+    #update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider)
  
     root.mainloop()
