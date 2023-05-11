@@ -4,7 +4,7 @@ from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
 import customtkinter as ctk
 from Microphone import Microphone
-from AudioRecorder import AudioRecorder
+import AudioRecorder 
 import queue
 import os
 
@@ -70,17 +70,8 @@ if __name__ == "__main__":
 
     audio_queue = queue.Queue()
 
-    user_mirophone = Microphone(str(sc.default_microphone().name), False)
-    user_audio_recorder = AudioRecorder(user_mirophone)
-
-    record_user = threading.Thread(target=user_audio_recorder.record_into_queue, args=(audio_queue, "You",))
-    record_user.start()
-
-    speaker_mirophone = Microphone(str(sc.default_speaker().name), True)
-    speaker_audio_recorder = AudioRecorder(speaker_mirophone)
-
-    record_speaker = threading.Thread(target=speaker_audio_recorder.record_into_queue, args=(audio_queue, "Speaker",))
-    record_speaker.start()
+    user_audio_recorder = AudioRecorder.DefaultMicRecorder()
+    user_audio_recorder.record_into_queue(audio_queue)
 
     global_transcriber = AudioTranscriber()
     transcribe = threading.Thread(target=global_transcriber.create_transcription_from_queue, args=(audio_queue,))

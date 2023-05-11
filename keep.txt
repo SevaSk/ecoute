@@ -1,0 +1,40 @@
+
+    with pyaudio.PyAudio() as p:
+
+        try:
+            # Get default WASAPI info
+            wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
+        except OSError:
+            exit()
+        
+        # Get default WASAPI speakers
+        default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
+        
+        if not default_speakers["isLoopbackDevice"]:
+            for loopback in p.get_loopback_device_info_generator():
+                if default_speakers["name"] in loopback["name"]:
+                    default_speakers = loopback
+                    break
+            else:
+                exit()
+
+    #source = sr.Microphone(sample_rate=int(default_speakers["defaultSampleRate"]),
+    #                        speaker=True,
+    #                        chunk_size= pyaudio.get_sample_size(pyaudio.paInt16))
+
+
+
+        stream = p.open(format=pyaudio.paInt16,
+                channels=default_speakers["maxInputChannels"],
+                rate=int(default_speakers["defaultSampleRate"]),
+                frames_per_buffer=pyaudio.get_sample_size(pyaudio.paInt16),
+                input=True,
+                input_device_index=default_speakers["index"]
+
+
+                # Write wav data to the temporary file as bytes.
+                with wave.open(temp_file, 'wb') as wf:
+                    wf.setnchannels(default_speakers["maxInputChannels"])
+                    wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+                    wf.setframerate(default_speakers["defaultSampleRate"])
+                    wf.writeframes(last_sample)
