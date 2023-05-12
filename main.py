@@ -79,13 +79,15 @@ if __name__ == "__main__":
     speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
     speaker_audio_recorder.record_into_queue(audio_queue)
 
-    global_transcriber = AudioTranscriber()
+    global_transcriber = AudioTranscriber(user_audio_recorder, speaker_audio_recorder)
     transcribe = threading.Thread(target=global_transcriber.create_transcription_from_queue, args=(audio_queue,))
     transcribe.start()
 
-    #responder = GPTResponder()
-    #respond = threading.Thread(target=responder.respond_to_transcriber, args=(global_transcriber,))
-    #respond.start()
+    responder = GPTResponder()
+    respond = threading.Thread(target=responder.respond_to_transcriber, args=(global_transcriber,))
+    respond.start()
+
+    print("READY")
 
     root.grid_rowconfigure(0, weight=100)
     root.grid_rowconfigure(1, weight=10)
@@ -100,6 +102,6 @@ if __name__ == "__main__":
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
     update_transcript_UI(global_transcriber, transcript_textbox)
-    #update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider)
+    update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider)
  
     root.mainloop()

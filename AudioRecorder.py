@@ -1,8 +1,8 @@
-import numpy as np
 import speech_recognition as sr
 import pyaudiowpatch as pyaudio
+from datetime import datetime
 
-RECORD_TIMEOUT = 2
+RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
 DYNAMIC_ENERGY_THRESHOLD = False
 
@@ -12,6 +12,7 @@ class DefaultMicRecorder:
         self.recorder.energy_threshold = ENERGY_THRESHOLD
         self.recorder.dynamic_energy_threshold = DYNAMIC_ENERGY_THRESHOLD
         self.source = sr.Microphone(sample_rate=16000)
+        self.num_channels = 1
 
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
@@ -19,7 +20,7 @@ class DefaultMicRecorder:
     def record_into_queue(self, audio_queue):
         def record_callback(_, audio:sr.AudioData) -> None:
             data = audio.get_raw_data()
-            audio_queue.put(("You", data, self.source.SAMPLE_RATE, self.source.SAMPLE_WIDTH, 1))
+            audio_queue.put(("You", data, datetime.utcnow()))
 
         self.recorder.listen_in_background(self.source, record_callback, phrase_time_limit=RECORD_TIMEOUT)
 
@@ -44,13 +45,14 @@ class DefaultSpeakerRecorder:
         self.source = sr.Microphone(sample_rate=int(self.default_speakers["defaultSampleRate"]),
                                 speaker=True,
                                 chunk_size= pyaudio.get_sample_size(pyaudio.paInt16))
-        
+        self.num_channels = self.default_speakers["maxInputChannels"]
+
+        with self.source:
+            self.recorder.adjust_for_ambient_noise(self.source)
 
     def record_into_queue(self, audio_queue):
         def record_callback(_, audio:sr.AudioData) -> None:
             data = audio.get_raw_data()
-            audio_queue.put(("Speaker", data, self.source.SAMPLE_RATE, 
-                             self.source.SAMPLE_WIDTH,
-                             self.default_speakers["maxInputChannels"]))
+            audio_queue.put(("Speaker", data, datetime.utcnow()))
 
         self.recorder.listen_in_background(self.source, record_callback, phrase_time_limit=RECORD_TIMEOUT)
