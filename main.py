@@ -32,15 +32,10 @@ def update_response_UI(responder, textbox, update_interval_slider_label, update_
     textbox.after(300, update_response_UI, responder, textbox, update_interval_slider_label, update_interval_slider)
 
 def clear_transcript_data(transcriber):
-    transcriber.transcript_data.clear()
-
-def clear_temp_files():
-    for file in os.listdir():
-        if file.startswith('temp_'):
-            os.remove(file)
+    transcriber.mic_transcript_data.clear()
+    transcriber.speaker_transcript_data.clear()
 
 if __name__ == "__main__":
-    clear_temp_files()
 
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("dark-blue")
