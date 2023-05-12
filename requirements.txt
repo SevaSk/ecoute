@@ -1,5 +1,4 @@
 numpy
-soundcard
 openai-whisper
 torch
 wave
