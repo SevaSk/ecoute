@@ -3,8 +3,8 @@ from __future__ import annotations
 import os
 from io import BytesIO
 
-from speech_recognition.audio import AudioData
-from speech_recognition.exceptions import SetupError
+from custom_speech_recognition.audio import AudioData
+from custom_speech_recognition.exceptions import SetupError
 
 
 def recognize_whisper_api(

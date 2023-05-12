@@ -1,4 +1,4 @@
-import speech_recognition as sr
+import custom_speech_recognition as sr
 import pyaudiowpatch as pyaudio
 from datetime import datetime
 

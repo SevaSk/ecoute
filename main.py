@@ -1,4 +1,3 @@
-import soundcard as sc
 import threading
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder

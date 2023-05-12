@@ -4,7 +4,7 @@ import wave
 import os
 import threading
 from tempfile import NamedTemporaryFile
-import speech_recognition as sr
+import custom_speech_recognition as sr
 import io
 from datetime import timedelta
 from time import sleep
