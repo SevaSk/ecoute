@@ -3,7 +3,6 @@ import threading
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
 import customtkinter as ctk
-from Microphone import Microphone
 import AudioRecorder 
 import queue
 import os
