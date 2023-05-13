@@ -14,8 +14,10 @@ class DefaultMicRecorder:
         self.source = sr.Microphone(sample_rate=16000)
         self.num_channels = 1
 
+        print("Adjusting for ambient microphone noise. Say something through the microphone")
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
+        print("Done adjusting for ambient microphone noise")
 
     def record_into_queue(self, audio_queue):
         def record_callback(_, audio:sr.AudioData) -> None:
@@ -44,11 +46,13 @@ class DefaultSpeakerRecorder:
         
         self.source = sr.Microphone(sample_rate=int(self.default_speakers["defaultSampleRate"]),
                                 speaker=True,
-                                chunk_size= pyaudio.get_sample_size(pyaudio.paInt16))
+                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16))
         self.num_channels = self.default_speakers["maxInputChannels"]
 
+        print("Adjusting for ambient speaker noise. Play something through the speaker")
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
+        print("Done adjusting for ambient speaker noise")
 
     def record_into_queue(self, audio_queue):
         def record_callback(_, audio:sr.AudioData) -> None:

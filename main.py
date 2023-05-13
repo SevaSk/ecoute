@@ -4,7 +4,6 @@ from GPTResponder import GPTResponder
 import customtkinter as ctk
 import AudioRecorder 
 import queue
-import os
 import time
 
 def write_in_textbox(textbox, text):

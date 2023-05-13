@@ -7,12 +7,13 @@ from tempfile import NamedTemporaryFile
 import custom_speech_recognition as sr
 import io
 from datetime import timedelta
-from time import sleep
 import pyaudiowpatch as pyaudio
 from AudioRecorder import DefaultMicRecorder, DefaultSpeakerRecorder
 from heapq import merge
 
-PHRASE_TIMEOUT = 4
+PHRASE_TIMEOUT = 3.01
+
+MAX_PHRASES = 10
 
 class AudioTranscriber:
     def __init__(self, default_mic : DefaultMicRecorder, default_speaker : DefaultSpeakerRecorder):
@@ -26,7 +27,7 @@ class AudioTranscriber:
         self.mic_channels = default_mic.num_channels
 
         self.speaker_sample_rate = default_speaker.source.SAMPLE_RATE
-        self.speaker_sample_rate = default_speaker.source.SAMPLE_RATE
+        self.speaker_sample_width = default_speaker.source.SAMPLE_WIDTH
         self.speaker_channels = default_speaker.num_channels
 
     def create_transcription_from_queue(self, audio_queue):
@@ -66,6 +67,8 @@ class AudioTranscriber:
 
                 if text != '' and text.lower() != 'you':
                     if mic_start_new_phrase or len(self.mic_transcript_data) == 0:
+                        if len(self.mic_transcript_data) > MAX_PHRASES:
+                            self.mic_transcript_data.pop()
                         self.mic_transcript_data = [(who_spoke + ": [" + text + ']\n\n', time_spoken)] + self.mic_transcript_data
                         self.transcript_changed_event.set()
                     else:
@@ -96,6 +99,8 @@ class AudioTranscriber:
 
                 if text != '' and text.lower() != 'you':
                     if speaker_start_new_phrase or len(self.speaker_transcript_data) == 0:
+                        if len(self.mic_transcript_data) > MAX_PHRASES:
+                            self.mic_transcript_data.pop()
                         self.speaker_transcript_data = [(who_spoke + ": [" + text + ']\n\n', time_spoken)] + self.speaker_transcript_data
                         self.transcript_changed_event.set()
 
@@ -107,5 +112,6 @@ class AudioTranscriber:
     def get_transcript(self):
         key = lambda x : x[1]
         transcript_tuple = list(merge(self.mic_transcript_data, self.speaker_transcript_data, key=key, reverse=True))
+        transcript_tuple = transcript_tuple[0:MAX_PHRASES]
         return "".join([t[0] for t in transcript_tuple])
     
