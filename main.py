@@ -72,7 +72,7 @@ if __name__ == "__main__":
     speaker_audio_recorder.record_into_queue(audio_queue)
 
     global_transcriber = AudioTranscriber(user_audio_recorder, speaker_audio_recorder)
-    transcribe = threading.Thread(target=global_transcriber.create_transcription_from_queue, args=(audio_queue,))
+    transcribe = threading.Thread(target=global_transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.start()
 
     responder = GPTResponder()
