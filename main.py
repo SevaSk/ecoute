@@ -49,18 +49,15 @@ def create_ui_components(root):
     response_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size), text_color='#639cdc', wrap="word")
     response_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="nsew")
 
+    freeze_button = ctk.CTkButton(root, text="Freeze", command=None)
+    freeze_button.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
+
     update_interval_slider_label = ctk.CTkLabel(root, text=f"", font=("Arial", 12), text_color="#FFFCF2")
-    update_interval_slider_label.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
+    update_interval_slider_label.grid(row=2, column=1, padx=10, pady=3, sticky="nsew")
 
     update_interval_slider = ctk.CTkSlider(root, from_=1, to=10, width=300, height=20, number_of_steps=9)
     update_interval_slider.set(2)
     update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
-
-    update_interval_slider_label = ctk.CTkLabel(root, text=f"Update interval: {update_interval_slider.get()} seconds", font=("Arial", 12), text_color="#FFFCF2")
-    update_interval_slider_label.grid(row=2, column=1, padx=10, pady=10, sticky="nsew")
-
-    freeze_button = ctk.CTkButton(root, text="Freeze", command=None)
-    freeze_button.grid(row=4, column=1, padx=10, pady=3, sticky="nsew")
 
     return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
 
@@ -89,10 +86,9 @@ def main():
     print("READY")
 
     root.grid_rowconfigure(0, weight=100)
-    root.grid_rowconfigure(1, weight=10)
+    root.grid_rowconfigure(1, weight=1)
     root.grid_rowconfigure(2, weight=1)
     root.grid_rowconfigure(3, weight=1)
-    root.grid_rowconfigure(4, weight=1)
     root.grid_columnconfigure(0, weight=2)
     root.grid_columnconfigure(1, weight=1)
 
@@ -106,6 +102,8 @@ def main():
         freeze_button.configure(text="Unfreeze" if freeze_state[0] else "Freeze")
 
     freeze_button.configure(command=freeze_unfreeze)
+
+    update_interval_slider_label.configure(text=f"Update interval: {update_interval_slider.get()} seconds")
 
     update_transcript_UI(global_transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
