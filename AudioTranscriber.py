@@ -106,3 +106,9 @@ class AudioTranscriber:
     def clear_transcript_data(self):
         self.transcript_data["You"].clear()
         self.transcript_data["Speaker"].clear()
+
+        self.audio_sources["You"]["last_sample"] = bytes()
+        self.audio_sources["Speaker"]["last_sample"] = bytes()
+
+        self.audio_sources["You"]["new_phrase"] = True
+        self.audio_sources["Speaker"]["new_phrase"] = True

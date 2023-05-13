@@ -28,8 +28,10 @@ def update_response_UI(responder, textbox, update_interval_slider_label, update_
 
     textbox.after(300, update_response_UI, responder, textbox, update_interval_slider_label, update_interval_slider)
 
-def clear_transcript(transcriber):
+def clear_context(transcriber, audio_queue):
     transcriber.clear_transcript_data()
+    with audio_queue.mutex:
+        audio_queue.queue.clear()
 
 def create_ui_components(root):
     ctk.set_appearance_mode("dark")
@@ -91,7 +93,7 @@ def main():
     root.grid_columnconfigure(1, weight=1)
 
      # Add the clear transcript button to the UI
-    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_transcript(global_transcriber, ))
+    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_context(global_transcriber, audio_queue, ))
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
     update_transcript_UI(global_transcriber, transcript_textbox)
