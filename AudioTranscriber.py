@@ -92,7 +92,7 @@ class AudioTranscriber:
 
         if source_info["new_phrase"] or len(transcript) == 0:
             if len(transcript) > MAX_PHRASES:
-                transcript.pop(0)  # remove oldest phrase
+                transcript.pop(-1)
             transcript.insert(0, (f"{who_spoke}: [{text}]\n\n", time_spoken))
         else:
             transcript[0] = (f"{who_spoke}: [{text}]\n\n", time_spoken)

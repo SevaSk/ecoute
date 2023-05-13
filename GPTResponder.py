@@ -25,12 +25,21 @@ class GPTResponder:
     def respond_to_transcriber(self, transcriber):
         while True:
             if transcriber.transcript_changed_event.is_set():
+                start_time = time.time()
+
                 transcriber.transcript_changed_event.clear() 
                 transcript_string = transcriber.get_transcript()
                 response = generate_response_from_transcript(transcript_string)
+                
+                end_time = time.time()  # Measure end time
+                execution_time = end_time - start_time  # Calculate the time it took to execute the function
+                
                 if response != '':
                     self.response = response
-                time.sleep(self.response_interval)
+
+                remaining_time = self.response_interval - execution_time
+                if remaining_time > 0:
+                    time.sleep(remaining_time)
             else:
                 time.sleep(0.3)
 
