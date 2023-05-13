@@ -1,4 +1,9 @@
 # ecoute
-pip install -r requirments.txt from root
+# install instructions:
+git clone https://github.com/SevaSk/ecoute
 
-python setup.py install in speech_recognition
+in ecoute folder:
+
+pip install -r requirments.txt
+
+python main.py
