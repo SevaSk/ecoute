@@ -24,7 +24,7 @@ class AudioTranscriber:
             "You": {
                 "sample_rate": default_mic.source.SAMPLE_RATE,
                 "sample_width": default_mic.source.SAMPLE_WIDTH,
-                "channels": default_mic.num_channels,
+                "channels": default_mic.source.channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
@@ -33,7 +33,7 @@ class AudioTranscriber:
             "Speaker": {
                 "sample_rate": default_speaker.source.SAMPLE_RATE,
                 "sample_width": default_speaker.source.SAMPLE_WIDTH,
-                "channels": default_speaker.num_channels,
+                "channels": default_speaker.source.channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
@@ -44,9 +44,8 @@ class AudioTranscriber:
     def transcribe_audio_queue(self, audio_queue):
         while True:
             who_spoke, data, time_spoken = audio_queue.get()
-            source_info = self.audio_sources[who_spoke]
-
             self.update_last_sample_and_phrase_status(who_spoke, data, time_spoken)
+            source_info = self.audio_sources[who_spoke]
             temp_file = source_info["process_data_func"](source_info["last_sample"])
             text = self.get_transcription(temp_file)
 
@@ -108,4 +107,3 @@ class AudioTranscriber:
     def clear_transcript_data(self):
         self.transcript_data["You"].clear()
         self.transcript_data["Speaker"].clear()
-        

@@ -7,12 +7,11 @@ ENERGY_THRESHOLD = 1000
 DYNAMIC_ENERGY_THRESHOLD = False
 
 class BaseRecorder:
-    def __init__(self, source, num_channels, source_name):
+    def __init__(self, source, source_name):
         self.recorder = sr.Recognizer()
         self.recorder.energy_threshold = ENERGY_THRESHOLD
         self.recorder.dynamic_energy_threshold = DYNAMIC_ENERGY_THRESHOLD
         self.source = source
-        self.num_channels = num_channels
         self.source_name = source_name
 
     def adjust_for_noise(self):
@@ -30,7 +29,7 @@ class BaseRecorder:
 
 class DefaultMicRecorder(BaseRecorder):
     def __init__(self):
-        super().__init__(source=sr.Microphone(sample_rate=16000), num_channels=1, source_name="You")
+        super().__init__(source=sr.Microphone(sample_rate=16000), source_name="You")
         self.adjust_for_noise()
 
 class DefaultSpeakerRecorder(BaseRecorder):
@@ -47,8 +46,10 @@ class DefaultSpeakerRecorder(BaseRecorder):
                 else:
                     print("[ERROR] No loopback device found.")
         
-        source = sr.Microphone(sample_rate=int(default_speakers["defaultSampleRate"]),
-                                speaker=True,
-                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16))
-        super().__init__(source=source, num_channels=default_speakers["maxInputChannels"], source_name="Speaker")
+        source = sr.Microphone(speaker=True,
+                               device_index= default_speakers["index"],
+                               sample_rate=int(default_speakers["defaultSampleRate"]),
+                               chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
+                               channels=default_speakers["maxInputChannels"])
+        super().__init__(source=source, source_name="Speaker")
         self.adjust_for_noise()

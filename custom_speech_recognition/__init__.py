@@ -71,7 +71,7 @@ class Microphone(AudioSource):
 
     Higher ``chunk_size`` values help avoid triggering on rapidly changing ambient noise, but also makes detection less sensitive. This value, generally, should be left at its default.
     """
-    def __init__(self, device_index=None, sample_rate=None, chunk_size=1024, speaker=False):
+    def __init__(self, device_index=None, sample_rate=None, chunk_size=1024, speaker=False, channels = 1):
         assert device_index is None or isinstance(device_index, int), "Device index must be None or an integer"
         assert sample_rate is None or (isinstance(sample_rate, int) and sample_rate > 0), "Sample rate must be None or a positive integer"
         assert isinstance(chunk_size, int) and chunk_size > 0, "Chunk size must be a positive integer"
@@ -96,6 +96,7 @@ class Microphone(AudioSource):
         self.SAMPLE_WIDTH = self.pyaudio_module.get_sample_size(self.format)  # size of each sample
         self.SAMPLE_RATE = sample_rate  # sampling rate in Hertz
         self.CHUNK = chunk_size  # number of frames stored in each buffer
+        self.channels = channels
 
         self.audio = None
         self.stream = None
@@ -178,35 +179,16 @@ class Microphone(AudioSource):
         try:
             if self.speaker:
                 p = self.audio
-                pyaudio = self.pyaudio_module
-                try:
-                    wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-                except:
-                    pass
-
-                default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
-                if not default_speakers["isLoopbackDevice"]:
-                    for loopback in p.get_loopback_device_info_generator():
-                        """
-                        Try to find loopback device with same name(and [Loopback suffix]).
-                        Unfortunately, this is the most adequate way at the moment.
-                        """
-                        if default_speakers["name"] in loopback["name"]:
-                            default_speakers = loopback
-                            break
-                    else:
-                        exit()
-
-                    self.stream = Microphone.MicrophoneStream(
-                        p.open(
-                            input_device_index=default_speakers["index"],
-                            channels=default_speakers["maxInputChannels"],
-                            format=self.format,
-                            rate=int(default_speakers["defaultSampleRate"]),
-                            frames_per_buffer=pyaudio.get_sample_size(pyaudio.paInt16),
-                            input=True,
-                        )
+                self.stream = Microphone.MicrophoneStream(
+                    p.open(
+                        input_device_index=self.device_index,
+                        channels=self.channels,
+                        format=self.format,
+                        rate=self.SAMPLE_RATE,
+                        frames_per_buffer=self.CHUNK,
+                        input=True
                     )
+                )
             else:
                 self.stream = Microphone.MicrophoneStream(
                     self.audio.open(
