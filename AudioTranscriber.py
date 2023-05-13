@@ -8,10 +8,9 @@ import custom_speech_recognition as sr
 import io
 from datetime import timedelta
 import pyaudiowpatch as pyaudio
-from AudioRecorder import DefaultMicRecorder, DefaultSpeakerRecorder
 from heapq import merge
 
-PHRASE_TIMEOUT = 3.01
+PHRASE_TIMEOUT = 3.05
 
 MAX_PHRASES = 10
 
