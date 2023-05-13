@@ -72,7 +72,7 @@ def main():
     speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
     speaker_audio_recorder.record_into_queue(audio_queue)
 
-    global_transcriber = AudioTranscriber(user_audio_recorder, speaker_audio_recorder)
+    global_transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source)
     transcribe = threading.Thread(target=global_transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.start()
 

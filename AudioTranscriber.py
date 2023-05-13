@@ -16,24 +16,24 @@ PHRASE_TIMEOUT = 3.01
 MAX_PHRASES = 10
 
 class AudioTranscriber:
-    def __init__(self, default_mic : DefaultMicRecorder, default_speaker : DefaultSpeakerRecorder):
+    def __init__(self, mic_source, speaker_source):
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
         self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
         self.audio_sources = {
             "You": {
-                "sample_rate": default_mic.source.SAMPLE_RATE,
-                "sample_width": default_mic.source.SAMPLE_WIDTH,
-                "channels": default_mic.source.channels,
+                "sample_rate": mic_source.SAMPLE_RATE,
+                "sample_width": mic_source.SAMPLE_WIDTH,
+                "channels": mic_source.channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
                 "process_data_func": self.process_mic_data
             },
             "Speaker": {
-                "sample_rate": default_speaker.source.SAMPLE_RATE,
-                "sample_width": default_speaker.source.SAMPLE_WIDTH,
-                "channels": default_speaker.source.channels,
+                "sample_rate": speaker_source.SAMPLE_RATE,
+                "sample_width": speaker_source.SAMPLE_WIDTH,
+                "channels": speaker_source.channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
