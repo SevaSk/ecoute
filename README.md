@@ -36,6 +36,13 @@ Follow these steps to set up and run ecoute on your local machine.
    ```
    pip install -r requirements.txt
    ```
+   
+   (OPTIONAL) but will make program run faster
+   
+   '''
+   pip install torch --index-url https://download.pytorch.org/whl/cu117
+  
+   '''
 
 4. Create a `keys.py` file and add your OpenAI API key:
 
