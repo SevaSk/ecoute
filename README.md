@@ -1,3 +1,12 @@
+
+# 🎧 Ecoute
+
+Ecoute is a live transcription tool that provides real-time transcripts for both the user's microphone input (You) and the user's speakers output (Speaker) in a textbox. It also generates a suggested response using OpenAI's GPT-3 for the user to say based on the live transcription of the conversation.
+
+## 📖 Description
+
+**Ecoute** is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3, Ecoute aims to make communication more efficient and enjoyable.
+
 ## 🚀 Getting Started
 
 Follow these steps to set up and run ecoute on your local machine.
@@ -52,4 +61,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to open issues or submit pull requests to improve ecoute.
-```
