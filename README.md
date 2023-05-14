@@ -53,7 +53,7 @@ Run the main script:
 python main.py
 ```
 
-Now, ecoute will start transcribing your microphone input and speaker output in real-time, and provide a suggested response based on the conversation.
+Now, ecoute will start transcribing your microphone input and speaker output in real-time, and provide a suggested response based on the conversation. It may take a couple seconds for it to warm up before the transcription becomes real time.
 
 ## 📖 License
 
