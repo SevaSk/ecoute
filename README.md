@@ -15,7 +15,7 @@ Follow these steps to set up and run ecoute on your local machine.
 
 - Python 3.x
 - An OpenAI API key
-- Only works on windows currently
+- Windows OS (Haven't tested on others)
 
 ### 🔧 Installation
 
