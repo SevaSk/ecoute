@@ -5,7 +5,7 @@ Ecoute is a live transcription tool that provides real-time transcripts for both
 
 ## 📖 Description
 
-**Ecoute** is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3, Ecoute aims to make communication more efficient and enjoyable.
+**Ecoute** is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3.5, Ecoute aims to make communication more efficient and enjoyable.
 
 ## 🚀 Getting Started
 
