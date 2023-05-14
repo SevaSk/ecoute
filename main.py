@@ -5,6 +5,7 @@ import customtkinter as ctk
 import AudioRecorder 
 import queue
 import time
+import torch
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
@@ -78,6 +79,8 @@ def main():
     global_transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source)
     transcribe = threading.Thread(target=global_transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.start()
+
+    print(f"[INFO] Whisper using GPU: " + str(torch.cuda.is_available()))
 
     responder = GPTResponder()
     respond = threading.Thread(target=responder.respond_to_transcriber, args=(global_transcriber,))
