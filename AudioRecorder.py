@@ -14,11 +14,11 @@ class BaseRecorder:
         self.source = source
         self.source_name = source_name
 
-    def adjust_for_noise(self):
-        print(f"[INFO] Adjusting for ambient noise from {self.source_name}. Please make some noise...")
+    def adjust_for_noise(self, device_name, msg):
+        print(f"[INFO] Adjusting for ambient noise from {device_name}. " + msg)
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
-        print(f"[INFO] Completed ambient noise adjustment for {self.source_name}.")
+        print(f"[INFO] Completed ambient noise adjustment for {device_name}.")
 
     def record_into_queue(self, audio_queue):
         def record_callback(_, audio:sr.AudioData) -> None:
@@ -30,7 +30,7 @@ class BaseRecorder:
 class DefaultMicRecorder(BaseRecorder):
     def __init__(self):
         super().__init__(source=sr.Microphone(sample_rate=16000), source_name="You")
-        self.adjust_for_noise()
+        self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
 
 class DefaultSpeakerRecorder(BaseRecorder):
     def __init__(self):
@@ -52,4 +52,4 @@ class DefaultSpeakerRecorder(BaseRecorder):
                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
                                channels=default_speakers["maxInputChannels"])
         super().__init__(source=source, source_name="Speaker")
-        self.adjust_for_noise()
+        self.adjust_for_noise("Default Speaker", "Please make or play some noise from the Default Speaker...")
