@@ -3,9 +3,11 @@
 
 Ecoute is a live transcription tool that provides real-time transcripts for both the user's microphone input (You) and the user's speakers output (Speaker) in a textbox. It also generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
 
-## 📖 Description
+## 📖 Demo
 
-**Ecoute** is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3.5, Ecoute aims to make communication more efficient and enjoyable.
+https://github.com/SevaSk/ecoute/assets/50382291/fe226c26-4571-4dcf-92b4-679baf006263
+
+Ecoute is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3.5, Ecoute aims to make communication more efficient and enjoyable.
 
 ## 🚀 Getting Started
 
@@ -54,6 +56,16 @@ python main.py
 ```
 
 Now, ecoute will start transcribing your microphone input and speaker output in real-time, and provide a suggested response based on the conversation. It may take a couple seconds for it to warm up before the transcription becomes real time.
+
+### ⚠️ Limitations
+
+While ecoute provides real-time transcription and response suggestions, there are several known limitations to its functionality that you should be aware of:
+
+**Default Mic and Speaker:** Ecoute is currently configured to listen only to the default microphone and speaker set in your system. It will not detect sound from other devices or systems. If you wish to use a different mic or speaker, you will need to set it as your default device in your system settings.
+
+**Whisper Model**: We utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
+
+**Language**: The Whisper model used in ecoute is set to English. As a result, it may not accurately transcribe non-English languages or dialects. We are actively working to add multi-language support to future versions of the program.
 
 ## 📖 License
 
