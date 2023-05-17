@@ -11,13 +11,13 @@ Ecoute is designed to help users in their conversations by providing live transc
 
 ## 🚀 Getting Started
 
-Follow these steps to set up and run ecoute on your local machine.
+Follow these steps to set up and run Ecoute on your local machine.
 
 ### 📋 Prerequisites
 
 - Python 3.x
 - An OpenAI API key
-- Windows OS (Haven't tested on others)
+- Windows OS (Not tested on others)
 
 ### 🔧 Installation
 
@@ -47,7 +47,7 @@ Follow these steps to set up and run ecoute on your local machine.
 
    Replace `API KEY` with your actual OpenAI API key.
 
-### 🎬 Running ecoute
+### 🎬 Running Ecoute
 
 Run the main script:
 
@@ -55,17 +55,17 @@ Run the main script:
 python main.py
 ```
 
-Now, ecoute will start transcribing your microphone input and speaker output in real-time, and provide a suggested response based on the conversation. It may take a couple seconds for it to warm up before the transcription becomes real time.
+Now, Ecoute will start transcribing your microphone input and speaker output in real-time, and provide a suggested response based on the conversation. It may take a couple of seconds to warm up before the transcription becomes real-time.
 
 ### ⚠️ Limitations
 
-While ecoute provides real-time transcription and response suggestions, there are several known limitations to its functionality that you should be aware of:
+While Ecoute provides real-time transcription and response suggestions, there are several known limitations to its functionality that you should be aware of:
 
 **Default Mic and Speaker:** Ecoute is currently configured to listen only to the default microphone and speaker set in your system. It will not detect sound from other devices or systems. If you wish to use a different mic or speaker, you will need to set it as your default device in your system settings.
 
 **Whisper Model**: We utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
 
-**Language**: The Whisper model used in ecoute is set to English. As a result, it may not accurately transcribe non-English languages or dialects. We are actively working to add multi-language support to future versions of the program.
+**Language**: The Whisper model used in Ecoute is set to English. As a result, it may not accurately transcribe non-English languages or dialects. We are actively working to add multi-language support to future versions of the program.
 
 ## 📖 License
 
@@ -73,4 +73,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests to improve ecoute.
+Contributions are welcome! Feel free to open issues or submit pull requests to improve Ecoute.
