@@ -5,7 +5,9 @@ Ecoute is a live transcription tool that provides real-time transcripts for both
 
 ## 📖 Demo
 
-https://github.com/SevaSk/ecoute/assets/50382291/fe226c26-4571-4dcf-92b4-679baf006263
+
+https://github.com/SevaSk/ecoute/assets/50382291/bb49e8fe-28fc-43f4-a193-5a38b168c048
+
 
 Ecoute is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3.5, Ecoute aims to make communication more efficient and enjoyable.
 
