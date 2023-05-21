@@ -18,6 +18,7 @@ Follow these steps to set up and run Ecoute on your local machine.
 - Python 3.x
 - An OpenAI API key
 - Windows OS (Not tested on others)
+- FFmpeg
 
 ### 🔧 Installation
 
