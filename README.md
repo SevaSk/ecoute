@@ -18,7 +18,18 @@ Follow these steps to set up and run Ecoute on your local machine.
 - Python 3.x
 - An OpenAI API key
 - Windows OS (Not tested on others)
-- FFmpeg
+- FFmpeg 
+
+If FFmpeg is not installed in your system, you can follow the steps below to install it.
+
+First, you need to install Chocolatey, a package manager for Windows. Open your PowerShell as Administrator and run the following command:
+```
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+```
+choco install ffmpeg
+```
+Please ensure that you run these commands in a PowerShell window with administrator privileges. If you face any issues during the installation, you can visit the official Chocolatey and FFmpeg websites for troubleshooting.
 
 ### 🔧 Installation
 
