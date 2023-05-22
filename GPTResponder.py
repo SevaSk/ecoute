@@ -12,8 +12,8 @@ def generate_response_from_transcript(transcript):
                 messages=[{"role": "system", "content": create_prompt(transcript)}],
                 temperature = 0.0
         )
-    except openai.OpenAIError:
-        print("An error occurred while calling OpenAI ChatCompletion.")
+    except Exception as e:
+        print(e)
         return ''
     full_response = response.choices[0].message.content
     try:
