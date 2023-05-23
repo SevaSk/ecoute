@@ -19,7 +19,7 @@ class AudioTranscriber:
         self.preffered_language = language
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
-        self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
+        self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny'))
         
         self.audio_sources = {
             "You": {
@@ -87,6 +87,7 @@ class AudioTranscriber:
     def get_transcription(self, file_path):
         
         result = self.audio_model.transcribe(file_path, fp16=torch.cuda.is_available(),task="translate")
+        
         return result['text'].strip()
 
     def update_transcript(self, who_spoke, text, time_spoken):
