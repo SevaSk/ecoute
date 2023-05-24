@@ -60,10 +60,10 @@ def create_ui_components(root):
     update_interval_slider.set(2)
     update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
 
-    combobox = ctk.CTkOptionMenu(root, values=["English", "Russian","Nepali"])                                  
+    combobox = ctk.CTkOptionMenu(root, values=["English", "Russian", "Nepali"])                                  
     combobox.grid(row=1, column=2, padx=2, pady=2, sticky="nsew")                                   
                                         
-    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button,combobox
+    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button, combobox
 
 def main():
     root = ctk.CTk()
