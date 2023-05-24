@@ -19,7 +19,7 @@ class AudioTranscriber:
         
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
-        self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny'))
+        self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
         
         self.audio_sources = {
             "You": {
