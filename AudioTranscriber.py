@@ -16,7 +16,7 @@ MAX_PHRASES = 10
 
 class AudioTranscriber:
     def __init__(self, mic_source, speaker_source, language):
-        self.preffered_language = language
+        
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
         self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny'))
