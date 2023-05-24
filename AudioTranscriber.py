@@ -86,7 +86,7 @@ class AudioTranscriber:
 
     def get_transcription(self, file_path):
         
-        result = self.audio_model.transcribe(file_path, fp16=torch.cuda.is_available(),task="translate")
+        result = self.audio_model.transcribe(file_path, fp16=torch.cuda.is_available())
         
         return result['text'].strip()
 
