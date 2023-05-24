@@ -15,7 +15,7 @@ PHRASE_TIMEOUT = 3.05
 MAX_PHRASES = 10
 
 class AudioTranscriber:
-    def __init__(self, mic_source, speaker_source,language):
+    def __init__(self, mic_source, speaker_source, language):
         self.preffered_language = language
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
