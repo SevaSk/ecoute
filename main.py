@@ -81,7 +81,7 @@ def main():
 
     
 
-    global_transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source,combobox)
+    global_transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source, combobox)
     transcribe = threading.Thread(target=global_transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.daemon = True
     transcribe.start()
