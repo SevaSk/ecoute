@@ -140,7 +140,6 @@ class AudioTranscriber:
                 "new_phrase": True,
                 "process_data_func": self.process_speaker_data
             }
-            
         }
 
     def transcribe_audio_queue(self, audio_queue):
@@ -158,7 +157,6 @@ class AudioTranscriber:
     def change_lang(self,language):
         self.lang = language
         
-
     def update_last_sample_and_phrase_status(self, who_spoke, data, time_spoken):
         source_info = self.audio_sources[who_spoke]
         if source_info["last_spoken"] and time_spoken - source_info["last_spoken"] > timedelta(seconds=PHRASE_TIMEOUT):
@@ -166,7 +164,6 @@ class AudioTranscriber:
             source_info["new_phrase"] = True
         else:
             source_info["new_phrase"] = False
-
         source_info["last_sample"] += data
         source_info["last_spoken"] = time_spoken 
 

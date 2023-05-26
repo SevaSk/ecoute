@@ -118,11 +118,6 @@ def main():
     update_transcript_UI(global_transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
     
-    
-    
-    
-    
-
     root.mainloop()
 
 if __name__ == "__main__":
