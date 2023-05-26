@@ -1,5 +1,5 @@
 import threading
-from AudioTranscriber import AudioTranscriber
+from AudioTranscriber import AudioTranscriber,LANGUAGES
 from GPTResponder import GPTResponder
 import customtkinter as ctk
 import AudioRecorder 
@@ -60,11 +60,14 @@ def create_ui_components(root):
     update_interval_slider.set(2)
     update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
 
-    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
+    combobox = ctk.CTkOptionMenu(root, values=list(LANGUAGES.values()))                                  
+    combobox.grid(row=1, column=2, padx=2, pady=2, sticky="nsew")                                   
+                                        
+    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button, combobox
 
 def main():
     root = ctk.CTk()
-    transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button = create_ui_components(root)
+    transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button, combobox = create_ui_components(root)
 
     audio_queue = queue.Queue()
 
@@ -75,8 +78,10 @@ def main():
 
     speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
     speaker_audio_recorder.record_into_queue(audio_queue)
+    
+    global_transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source,combobox.get())
+    combobox.configure(command=global_transcriber.change_lang)
 
-    global_transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source)
     transcribe = threading.Thread(target=global_transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.daemon = True
     transcribe.start()
@@ -112,7 +117,12 @@ def main():
 
     update_transcript_UI(global_transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
- 
+    
+    
+    
+    
+    
+
     root.mainloop()
 
 if __name__ == "__main__":

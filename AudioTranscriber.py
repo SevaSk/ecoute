@@ -13,9 +13,111 @@ from heapq import merge
 PHRASE_TIMEOUT = 3.05
 
 MAX_PHRASES = 10
+LANGUAGES = {
+    "en":  "english",
+    "zh": "chinese",
+    "de": "german",
+    "es": "spanish",
+    "ru": "russian",
+    "ko": "korean",
+    "fr": "french",
+    "ja": "japanese",
+    "pt": "portuguese",
+    "tr": "turkish",
+    "pl": "polish",
+    "ca": "catalan",
+    "nl": "dutch",
+    "ar": "arabic",
+    "sv": "swedish",
+    "it": "italian",
+    "id": "indonesian",
+    "hi": "hindi",
+    "fi": "finnish",
+    "vi": "vietnamese",
+    "iw": "hebrew",
+    "uk": "ukrainian",
+    "el": "greek",
+    "ms": "malay",
+    "cs": "czech",
+    "ro": "romanian",
+    "da": "danish",
+    "hu": "hungarian",
+    "ta": "tamil",
+    "no": "norwegian",
+    "th": "thai",
+    "ur": "urdu",
+    "hr": "croatian",
+    "bg": "bulgarian",
+    "lt": "lithuanian",
+    "la": "latin",
+    "mi": "maori",
+    "ml": "malayalam",
+    "cy": "welsh",
+    "sk": "slovak",
+    "te": "telugu",
+    "fa": "persian",
+    "lv": "latvian",
+    "bn": "bengali",
+    "sr": "serbian",
+    "az": "azerbaijani",
+    "sl": "slovenian",
+    "kn": "kannada",
+    "et": "estonian",
+    "mk": "macedonian",
+    "br": "breton",
+    "eu": "basque",
+    "is": "icelandic",
+    "hy": "armenian",
+    "ne": "nepali",
+    "mn": "mongolian",
+    "bs": "bosnian",
+    "kk": "kazakh",
+    "sq": "albanian",
+    "sw": "swahili",
+    "gl": "galician",
+    "mr": "marathi",
+    "pa": "punjabi",
+    "si": "sinhala",
+    "km": "khmer",
+    "sn": "shona",
+    "yo": "yoruba",
+    "so": "somali",
+    "af": "afrikaans",
+    "oc": "occitan",
+    "ka": "georgian",
+    "be": "belarusian",
+    "tg": "tajik",
+    "sd": "sindhi",
+    "gu": "gujarati",
+    "am": "amharic",
+    "yi": "yiddish",
+    "lo": "lao",
+    "uz": "uzbek",
+    "fo": "faroese",
+    "ht": "haitian creole",
+    "ps": "pashto",
+    "tk": "turkmen",
+    "nn": "nynorsk",
+    "mt": "maltese",
+    "sa": "sanskrit",
+    "lb": "luxembourgish",
+    "my": "myanmar",
+    "bo": "tibetan",
+    "tl": "tagalog",
+    "mg": "malagasy",
+    "as": "assamese",
+    "tt": "tatar",
+    "haw": "hawaiian",
+    "ln": "lingala",
+    "ha": "hausa",
+    "ba": "bashkir",
+    "jw": "javanese",
+    "su": "sundanese",
+}
 
 class AudioTranscriber:
-    def __init__(self, mic_source, speaker_source):
+    def __init__(self, mic_source, speaker_source, language):
+        self.lang = language
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
         self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
@@ -38,6 +140,7 @@ class AudioTranscriber:
                 "new_phrase": True,
                 "process_data_func": self.process_speaker_data
             }
+            
         }
 
     def transcribe_audio_queue(self, audio_queue):
@@ -51,6 +154,10 @@ class AudioTranscriber:
             if text != '' and text.lower() != 'you':
                 self.update_transcript(who_spoke, text, time_spoken)
                 self.transcript_changed_event.set()
+
+    def change_lang(self,language):
+        self.lang = language
+        
 
     def update_last_sample_and_phrase_status(self, who_spoke, data, time_spoken):
         source_info = self.audio_sources[who_spoke]
@@ -82,7 +189,11 @@ class AudioTranscriber:
         return temp_file
 
     def get_transcription(self, file_path):
-        result = self.audio_model.transcribe(file_path, fp16=torch.cuda.is_available())
+        if self.lang == "en":
+            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
+        else:
+            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.pt'))     
+        result = self.audio_model.transcribe(file_path, fp16=torch.cuda.is_available(), language= self.lang)
         return result['text'].strip()
 
     def update_transcript(self, who_spoke, text, time_spoken):
