@@ -52,7 +52,7 @@ Please ensure that you run these commands in a PowerShell window with administra
    pip install -r requirements.txt
    ```
    
-4. Create a `keys.py` file and add your OpenAI API key:
+4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
 
    ```
    echo 'OPENAI_API_KEY = "API KEY"' > keys.py
