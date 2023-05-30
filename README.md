@@ -55,7 +55,7 @@ Please ensure that you run these commands in a PowerShell window with administra
 4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
 
    ```
-   echo OPENAI_API_KEY = "API KEY" > keys.py
+   echo OPENAI_API_KEY="API KEY" > keys.py
    ```
 
    Replace `API KEY` with your actual OpenAI API key.
