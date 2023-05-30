@@ -10,20 +10,16 @@ from datetime import timedelta
 import pyaudiowpatch as pyaudio
 from heapq import merge
 
-
-
-
 PHRASE_TIMEOUT = 3.05
 
 MAX_PHRASES = 10
 
-
 class AudioTranscriber:
-    def __init__(self, mic_source, speaker_source, language):
-        self.lang = language
+    def __init__(self, mic_source, speaker_source, model,):
+        
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
-        self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
+        self.audio_model = model
         self.audio_sources = {
             "You": {
                 "sample_rate": mic_source.SAMPLE_RATE,
@@ -43,7 +39,6 @@ class AudioTranscriber:
                 "new_phrase": True,
                 "process_data_func": self.process_speaker_data
             }
-            
         }
 
     def transcribe_audio_queue(self, audio_queue):
@@ -52,18 +47,11 @@ class AudioTranscriber:
             self.update_last_sample_and_phrase_status(who_spoke, data, time_spoken)
             source_info = self.audio_sources[who_spoke]
             temp_file = source_info["process_data_func"](source_info["last_sample"])
-            text = self.get_transcription(temp_file)
+            text = self.audio_model.get_transcription(temp_file)
 
             if text != '' and text.lower() != 'you':
                 self.update_transcript(who_spoke, text, time_spoken)
                 self.transcript_changed_event.set()
-
-    def change_lang(self,language):
-        self.lang = language
-        if self.lang == "en":
-            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
-        else:
-            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.pt')) 
 
     def update_last_sample_and_phrase_status(self, who_spoke, data, time_spoken):
         source_info = self.audio_sources[who_spoke]
@@ -72,6 +60,7 @@ class AudioTranscriber:
             source_info["new_phrase"] = True
         else:
             source_info["new_phrase"] = False
+
         source_info["last_sample"] += data
         source_info["last_spoken"] = time_spoken 
 
@@ -93,11 +82,6 @@ class AudioTranscriber:
             wf.writeframes(data)
         return temp_file
 
-    def get_transcription(self, file_path):
-           
-        result = self.audio_model.transcribe(file_path, fp16=torch.cuda.is_available(), language= self.lang)
-        return result['text'].strip()
-
     def update_transcript(self, who_spoke, text, time_spoken):
         source_info = self.audio_sources[who_spoke]
         transcript = self.transcript_data[who_spoke]
@@ -108,6 +92,8 @@ class AudioTranscriber:
             transcript.insert(0, (f"{who_spoke}: [{text}]\n\n", time_spoken))
         else:
             transcript[0] = (f"{who_spoke}: [{text}]\n\n", time_spoken)
+    
+  
 
     def get_transcript(self):
         combined_transcript = list(merge(

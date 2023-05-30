@@ -1,12 +1,14 @@
 import threading
 from AudioTranscriber import AudioTranscriber
-from lanuage import LANGUAGES
 from GPTResponder import GPTResponder
 import customtkinter as ctk
 import AudioRecorder 
 import queue
 import time
 import torch
+import sys
+import TranscriberModels
+from lanuage import LANGUAGES
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
@@ -79,18 +81,17 @@ def main():
 
     speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
     speaker_audio_recorder.record_into_queue(audio_queue)
-    
-    global_transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source,combobox.get())
-    combobox.configure(command=global_transcriber.change_lang)
 
-    transcribe = threading.Thread(target=global_transcriber.transcribe_audio_queue, args=(audio_queue,))
+    model = TranscriberModels.get_model('--api' in sys.argv)
+    combobox.configure(command=model.change_lang)
+
+    transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source, model)
+    transcribe = threading.Thread(target=transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.daemon = True
     transcribe.start()
 
-    print(f"[INFO] Whisper using GPU: " + str(torch.cuda.is_available()))
-
     responder = GPTResponder()
-    respond = threading.Thread(target=responder.respond_to_transcriber, args=(global_transcriber,))
+    respond = threading.Thread(target=responder.respond_to_transcriber, args=(transcriber,))
     respond.daemon = True
     respond.start()
 
@@ -104,7 +105,7 @@ def main():
     root.grid_columnconfigure(1, weight=1)
 
      # Add the clear transcript button to the UI
-    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_context(global_transcriber, audio_queue, ))
+    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_context(transcriber, audio_queue, ))
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
     freeze_state = [False]  # Using list to be able to change its content inside inner functions
@@ -116,10 +117,9 @@ def main():
 
     update_interval_slider_label.configure(text=f"Update interval: {update_interval_slider.get()} seconds")
 
-    update_transcript_UI(global_transcriber, transcript_textbox)
+    update_transcript_UI(transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
-    
-    
+ 
     root.mainloop()
 
 if __name__ == "__main__":
