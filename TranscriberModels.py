@@ -19,6 +19,7 @@ class WhisperTranscriber:
             result = self.audio_model.transcribe(wav_file_path, fp16=torch.cuda.is_available())
         except Exception as e:
             print(e)
+            return ''
         return result['text'].strip()
     
 class APIWhisperTranscriber:
@@ -30,5 +31,6 @@ class APIWhisperTranscriber:
             result = openai.Audio.translate("whisper-1", audio_file)
         except Exception as e:
             print(e)
+            return ''
 
         return result['text'].strip()
