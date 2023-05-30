@@ -1,5 +1,6 @@
 import threading
-from AudioTranscriber import AudioTranscriber,LANGUAGES
+from AudioTranscriber import AudioTranscriber
+from lanuage import LANGUAGES
 from GPTResponder import GPTResponder
 import customtkinter as ctk
 import AudioRecorder 
@@ -61,7 +62,7 @@ def create_ui_components(root):
     update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
 
     combobox = ctk.CTkOptionMenu(root, values=list(LANGUAGES.values()))                                  
-    combobox.grid(row=1, column=2, padx=2, pady=2, sticky="nsew")                                   
+    combobox.grid(row=3, column=0, padx=200, pady=10, sticky="nsew")                                   
                                         
     return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button, combobox
 
@@ -119,10 +120,6 @@ def main():
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
     
     
-    
-    
-    
-
     root.mainloop()
 
 if __name__ == "__main__":
