@@ -15,10 +15,10 @@ PHRASE_TIMEOUT = 3.05
 MAX_PHRASES = 10
 
 class AudioTranscriber:
-    def __init__(self, mic_source, speaker_source):
+    def __init__(self, mic_source, speaker_source, model):
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
-        self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
+        self.audio_model = model
         self.audio_sources = {
             "You": {
                 "sample_rate": mic_source.SAMPLE_RATE,
@@ -46,7 +46,7 @@ class AudioTranscriber:
             self.update_last_sample_and_phrase_status(who_spoke, data, time_spoken)
             source_info = self.audio_sources[who_spoke]
             temp_file = source_info["process_data_func"](source_info["last_sample"])
-            text = self.get_transcription(temp_file)
+            text = self.audio_model.get_transcription(temp_file)
 
             if text != '' and text.lower() != 'you':
                 self.update_transcript(who_spoke, text, time_spoken)
@@ -80,10 +80,6 @@ class AudioTranscriber:
             wf.setframerate(self.audio_sources["Speaker"]["sample_rate"])
             wf.writeframes(data)
         return temp_file
-
-    def get_transcription(self, file_path):
-        result = self.audio_model.transcribe(file_path, fp16=torch.cuda.is_available())
-        return result['text'].strip()
 
     def update_transcript(self, who_spoke, text, time_spoken):
         source_info = self.audio_sources[who_spoke]
