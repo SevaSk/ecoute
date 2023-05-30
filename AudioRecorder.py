@@ -1,6 +1,11 @@
 import custom_speech_recognition as sr
-import pyaudiowpatch as pyaudio
 from datetime import datetime
+import os
+
+if os.name == 'nt':
+    import pyaudiowpatch as pyaudio
+else:
+    import pyaudio
 
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
@@ -34,17 +39,20 @@ class DefaultMicRecorder(BaseRecorder):
 
 class DefaultSpeakerRecorder(BaseRecorder):
     def __init__(self):
-        with pyaudio.PyAudio() as p:
-            wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-            default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
-            
-            if not default_speakers["isLoopbackDevice"]:
-                for loopback in p.get_loopback_device_info_generator():
-                    if default_speakers["name"] in loopback["name"]:
-                        default_speakers = loopback
-                        break
-                else:
-                    print("[ERROR] No loopback device found.")
+        if os.name == 'nt':
+            with pyaudio.PyAudio() as p:
+                wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
+                default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
+                if not default_speakers["isLoopbackDevice"]:
+                    for loopback in p.get_loopback_device_info_generator():
+                        if default_speakers["name"] in loopback["name"]:
+                            default_speakers = loopback
+                            break
+                    else:
+                        print("[ERROR] No loopback device found.")
+        else:
+            p = pyaudio.PyAudio()
+            default_speakers = p.get_device_info_by_index(0)
         
         source = sr.Microphone(speaker=True,
                                device_index= default_speakers["index"],

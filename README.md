@@ -32,6 +32,10 @@ choco install ffmpeg-full
 ```
 Please ensure that you run these commands in a PowerShell window with administrator privileges. If you face any issues during the installation, you can visit the official Chocolatey and FFmpeg websites for troubleshooting.
 
+To run on mac os, please install the following
+`brew install portaudio`
+`brew install python-tk `
+
 ### 🔧 Installation
 
 1. Clone the repository:
@@ -59,6 +63,7 @@ Please ensure that you run these commands in a PowerShell window with administra
    ```
 
    Replace `API KEY` with your actual OpenAI API key.
+
 
 ### 🎬 Running Ecoute
 

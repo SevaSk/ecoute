@@ -3,6 +3,9 @@ openai-whisper==20230314
 Wave==0.0.2
 openai==0.27.6
 customtkinter==5.1.3
-PyAudioWPatch==0.2.12.5
 --extra-index-url https://download.pytorch.org/whl/cu117
 torch
+
+# Windows-specific dependencies
+PyAudioWPatch==0.2.12.5; platform_system == "Windows"
+pyaudio; platform_system != "Windows"
