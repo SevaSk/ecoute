@@ -62,11 +62,18 @@ def create_ui_components(root):
     update_interval_slider.set(2)
     update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
 
-    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
+    selected_speaker_slider_label = ctk.CTkLabel(root, text=f"Default Speaker", font=("Arial", 12), text_color="#FFFCF2")
+    selected_speaker_slider_label.grid(row=2, column=0, padx=10, pady=3, sticky="nsew")
+
+    selected_speaker = ctk.CTkComboBox(master=root,font=("Arial", 12), text_color="#FFFCF2",
+                                     command=None)
+    selected_speaker.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
+
+    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button, selected_speaker
 
 def main():
     root = ctk.CTk()
-    transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button = create_ui_components(root)
+    transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button, selected_speaker = create_ui_components(root)
 
     audio_queue = queue.Queue()
 
@@ -115,6 +122,8 @@ def main():
     update_transcript_UI(transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
  
+    selected_speaker.configure(values=speaker_audio_recorder.list_audio_devices(),command=speaker_audio_recorder.set_default_speaker)
+
     root.mainloop()
 
 if __name__ == "__main__":

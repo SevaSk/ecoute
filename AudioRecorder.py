@@ -1,6 +1,7 @@
 import custom_speech_recognition as sr
 from datetime import datetime
 import os
+import sounddevice as sd
 
 if os.name == 'nt':
     import pyaudiowpatch as pyaudio
@@ -42,7 +43,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
         if os.name == 'nt':
             with pyaudio.PyAudio() as p:
                 wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-                default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
+                self.default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
                 if not default_speakers["isLoopbackDevice"]:
                     for loopback in p.get_loopback_device_info_generator():
                         if default_speakers["name"] in loopback["name"]:
@@ -51,13 +52,37 @@ class DefaultSpeakerRecorder(BaseRecorder):
                     else:
                         print("[ERROR] No loopback device found.")
         else:
+            self.default_device_index = 1
             p = pyaudio.PyAudio()
-            default_speakers = p.get_device_info_by_index(1)
-        
+            self.default_speakers = p.get_device_info_by_index(self.default_device_index)
+        self.set_source()
+    def set_source(self):
         source = sr.Microphone(speaker=True,
-                               device_index= default_speakers["index"],
-                               sample_rate=int(default_speakers["defaultSampleRate"]),
+                               device_index= self.default_speakers["index"],
+                               sample_rate=int(self.default_speakers["defaultSampleRate"]),
                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
-                               channels=default_speakers["maxInputChannels"])
+                               channels=self.default_speakers["maxInputChannels"])
         super().__init__(source=source, source_name="Speaker")
         self.adjust_for_noise("Default Speaker", "Please make or play some noise from the Default Speaker...")
+    def list_audio_devices(self):
+        if os.name == 'nt':
+            pass
+        else:
+            # Get information about all available devices
+            devices = sd.query_devices()
+        
+            # Extract device names into a list
+            return [device['name'] for device in devices]
+    def set_default_speaker(self,selected_speaker):
+        
+        # Retrieve information about all available audio devices
+        devices = sd.query_devices()
+
+        # Iterate over devices and find the index of the matching device name
+        for index, device in enumerate(devices):
+            if device['name'] == selected_speaker:
+                self.default_device_index = index
+                self.set_source()
+                break
+
+     

@@ -9,3 +9,4 @@ torch
 # Windows-specific dependencies
 PyAudioWPatch==0.2.12.5; platform_system == "Windows"
 pyaudio; platform_system != "Windows"
+sounddevice; platform_system != "Windows"
