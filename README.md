@@ -54,10 +54,15 @@ Please ensure that you run these commands in a PowerShell window with administra
    
 4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
 
+   -Option 1: You can utilize a command on your terminal. Run the following command, ensuring to replace "API KEY" with your actual OpenAI API key:
    ```
    python -c "with open('keys.py', 'w', encoding='utf-8') as f: f.write('OPENAI_API_KEY=\"API KEY\"')"
    ```
-
+   
+   -Option 2: You can create the keys.py file manually. Open up your text editor of choice and enter the following content:
+   ```
+   OPENAI_API_KEY="API KEY"
+   ```
    Replace `API KEY` with your actual OpenAI API key.
 
 ### 🎬 Running Ecoute
