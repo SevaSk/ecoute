@@ -46,6 +46,9 @@ If FFmpeg is not installed in your system, you can follow the steps below to ins
     brew install portaudio
     brew install python-tk
     
+    You might need to change the index of your speaker depending on your setting to 0 or 1
+    on line 55 AudioRecorder.py
+
 </details>
 
 ### 🔧 Installation
