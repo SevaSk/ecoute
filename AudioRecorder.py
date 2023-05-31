@@ -1,55 +1,194 @@
-import custom_speech_recognition as sr
-import pyaudiowpatch as pyaudio
-from datetime import datetime
+package main
 
-RECORD_TIMEOUT = 3
-ENERGY_THRESHOLD = 1000
-DYNAMIC_ENERGY_THRESHOLD = False
+import (
+	"fmt"
+	"time"
 
-class BaseRecorder:
-    def __init__(self, source, source_name):
-        self.recorder = sr.Recognizer()
-        self.recorder.energy_threshold = ENERGY_THRESHOLD
-        self.recorder.dynamic_energy_threshold = DYNAMIC_ENERGY_THRESHOLD
-        self.source = source
-        self.source_name = source_name
+	"github.com/go-audio/audio"
+	"github.com/go-audio/audio/mix"
+	"github.com/go-audio/wav"
+	"github.com/gordonklaus/portaudio"
+	"github.com/tebeka/snowboy"
+)
 
-    def adjust_for_noise(self, device_name, msg):
-        print(f"[INFO] Adjusting for ambient noise from {device_name}. " + msg)
-        with self.source:
-            self.recorder.adjust_for_ambient_noise(self.source)
-        print(f"[INFO] Completed ambient noise adjustment for {device_name}.")
+const (
+	RECORD_TIMEOUT        = 3
+	ENERGY_THRESHOLD      = 1000
+	DYNAMIC_ENERGY_THRESH = false
+)
 
-    def record_into_queue(self, audio_queue):
-        def record_callback(_, audio:sr.AudioData) -> None:
-            data = audio.get_raw_data()
-            audio_queue.put((self.source_name, data, datetime.utcnow()))
+type BaseRecorder struct {
+	Recorder           *snowboy.Recognizer
+	Source             *portaudio.Stream
+	SourceName         string
+}
 
-        self.recorder.listen_in_background(self.source, record_callback, phrase_time_limit=RECORD_TIMEOUT)
+func NewBaseRecorder(source *portaudio.Stream, sourceName string) *BaseRecorder {
+	recorder, err := snowboy.NewRecognizer("resources/common.res")
+	if err != nil {
+		fmt.Println("Failed to initialize snowboy recognizer:", err)
+		return nil
+	}
 
-class DefaultMicRecorder(BaseRecorder):
-    def __init__(self):
-        super().__init__(source=sr.Microphone(sample_rate=16000), source_name="You")
-        self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
+	recorder.SetEnergyThreshold(ENERGY_THRESHOLD)
+	recorder.SetDynamicEnergyThreshold(DYNAMIC_ENERGY_THRESH)
 
-class DefaultSpeakerRecorder(BaseRecorder):
-    def __init__(self):
-        with pyaudio.PyAudio() as p:
-            wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-            default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
-            
-            if not default_speakers["isLoopbackDevice"]:
-                for loopback in p.get_loopback_device_info_generator():
-                    if default_speakers["name"] in loopback["name"]:
-                        default_speakers = loopback
-                        break
-                else:
-                    print("[ERROR] No loopback device found.")
-        
-        source = sr.Microphone(speaker=True,
-                               device_index= default_speakers["index"],
-                               sample_rate=int(default_speakers["defaultSampleRate"]),
-                               chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
-                               channels=default_speakers["maxInputChannels"])
-        super().__init__(source=source, source_name="Speaker")
-        self.adjust_for_noise("Default Speaker", "Please make or play some noise from the Default Speaker...")
+	return &BaseRecorder{
+		Recorder:   recorder,
+		Source:     source,
+		SourceName: sourceName,
+	}
+}
+
+func (r *BaseRecorder) AdjustForNoise(deviceName string, msg string) {
+	fmt.Printf("[INFO] Adjusting for ambient noise from %s. %s\n", deviceName, msg)
+
+	if err := r.Source.Start(); err != nil {
+		fmt.Println("Failed to start audio source:", err)
+		return
+	}
+
+	audioBuffer := &audio.IntBuffer{}
+	ambientFrames := make([]int, r.Source.Info().SampleRate*5)
+	for i := 0; i < len(ambientFrames)/audioBuffer.Format.NumChannels; {
+		if err := r.Source.Read(audioBuffer); err != nil {
+			fmt.Println("Failed to read audio buffer:", err)
+			return
+		}
+		for _, sample := range audioBuffer.Data {
+			ambientFrames[i] = sample
+			i++
+		}
+	}
+
+	if err := r.Recorder.AdjustThreshold(ambientFrames); err != nil {
+		fmt.Println("Failed to adjust threshold:", err)
+		return
+	}
+
+	if err := r.Source.Stop(); err != nil {
+		fmt.Println("Failed to stop audio source:", err)
+		return
+	}
+
+	fmt.Printf("[INFO] Completed ambient noise adjustment for %s.\n", deviceName)
+}
+
+func (r *BaseRecorder) RecordIntoQueue(audioQueue chan<- *audio.IntBuffer) {
+	callback := func(in []int) {
+		audioBuffer := &audio.IntBuffer{
+			Data:   in,
+			Format: &audio.Format{SampleRate: r.Source.Info().SampleRate, NumChannels: 1},
+		}
+		audioQueue <- audioBuffer
+	}
+
+	if err := r.Source.Start(); err != nil {
+		fmt.Println("Failed to start audio source:", err)
+		return
+	}
+
+	streamParams := r.Source.Info().SampleRate
+	if err := r.Recorder.Run(callback, streamParams); err != nil {
+		fmt.Println("Failed to run recorder:", err)
+		return
+	}
+
+	time.Sleep(RECORD_TIMEOUT * time.Second)
+
+	if err := r.Recorder.Stop(); err != nil {
+		fmt.Println("Failed to stop recorder:", err)
+		return
+	}
+
+	if err := r.Source.Stop(); err != nil {
+		fmt.Println("Failed to stop audio source:", err)
+		return
+	}
+}
+
+type DefaultMicRecorder struct {
+	*BaseRecorder
+}
+
+func NewDefaultMicRecorder() *DefaultMicRecorder {
+	stream, err := portaudio.OpenDefaultStream(1, 0, 16000, len([]int{0}), nil)
+	if err != nil {
+		fmt.Println("Failed to open default stream:", err)
+		return nil
+	}
+
+	return &DefaultMicRecorder{
+		BaseRecorder: NewBaseRecorder(stream, "You"),
+	}
+}
+
+func (r *DefaultMicRecorder) AdjustForNoise() {
+	r.BaseRecorder.AdjustForNoise("Default Mic", "Please make some noise from the Default Mic...")
+}
+
+type DefaultSpeakerRecorder struct {
+	*BaseRecorder
+}
+
+func NewDefaultSpeakerRecorder() *DefaultSpeakerRecorder {
+	portaudio.Initialize()
+	defer portaudio.Terminate()
+
+	wasapiHostAPI := portaudio.HostApis()[portaudio.WASAPI]
+	defaultOutputDevice := wasapiHostAPI.Devices[wasapiHostAPI.DefaultOutputDeviceIndex]
+
+	var defaultSpeakers *portaudio.DeviceInfo
+
+	if !defaultOutputDevice.IsLoopbackDevice {
+		for _, loopback := range wasapiHostAPI.Devices {
+			if loopback.Name == defaultOutputDevice.Name {
+				defaultSpeakers = loopback
+				break
+			}
+		}
+	}
+
+	if defaultSpeakers == nil {
+		fmt.Println("[ERROR] No loopback device found.")
+		return nil
+	}
+
+	stream, err := portaudio.OpenDefaultStream(0, 1, float64(defaultSpeakers.DefaultSampleRate), defaultSpeakers.MaxInputChannels, nil)
+	if err != nil {
+		fmt.Println("Failed to open default stream:", err)
+		return nil
+	}
+
+	return &DefaultSpeakerRecorder{
+		BaseRecorder: NewBaseRecorder(stream, "Speaker"),
+	}
+}
+
+func (r *DefaultSpeakerRecorder) AdjustForNoise() {
+	r.BaseRecorder.AdjustForNoise("Default Speaker", "Please make or play some noise from the Default Speaker...")
+}
+
+func main() {
+	micRecorder := NewDefaultMicRecorder()
+	if micRecorder == nil {
+		return
+	}
+	micRecorder.AdjustForNoise()
+	audioQueue := make(chan *audio.IntBuffer)
+	go micRecorder.RecordIntoQueue(audioQueue)
+
+	speakerRecorder := NewDefaultSpeakerRecorder()
+	if speakerRecorder == nil {
+		return
+	}
+	speakerRecorder.AdjustForNoise()
+	go speakerRecorder.RecordIntoQueue(audioQueue)
+
+	for audioBuffer := range audioQueue {
+		// Process the audio buffer
+		fmt.Println("Received audio buffer:", audioBuffer)
+	}
+
+	close(audioQueue)
+}
