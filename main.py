@@ -8,7 +8,7 @@ import time
 import torch
 import sys
 import TranscriberModels
-from lanuage import LANGUAGES
+from language import LANGUAGES
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
