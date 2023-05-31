@@ -9,12 +9,10 @@ def get_model(use_api):
     else:
         return WhisperTranscriber()
 
-class WhisperTranscriber():
-    
-    
-    def __init__(self, language="en"):
-        self.lang = language
-        self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
+class WhisperTranscriber:
+    def __init__(self):
+        self.lang = "en"
+        self.audio_model = self.change_lang(self.lang)
         print(f"[INFO] Whisper using GPU: " + str(torch.cuda.is_available()))
 
     def get_transcription(self, wav_file_path):
@@ -25,22 +23,21 @@ class WhisperTranscriber():
             return ''
         return result['text'].strip()
     
-    def change_lang(self,language):
+    def change_lang(self, language):
         self.lang = language
         if self.lang == "en":
             self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
+            return self.audio_model
         else:
-            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.pt')) 
+            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.pt'))
+            return self.audio_model 
 
 class APIWhisperTranscriber:
     def get_transcription(self, wav_file_path):
-        new_file_path = wav_file_path + '.wav'
-        os.rename(wav_file_path, new_file_path)
-        audio_file= open(new_file_path, "rb")
         try:
-            result = openai.Audio.translate("whisper-1", audio_file)
+            with open(wav_file_path, "rb") as audio_file:
+                result = openai.Audio.translate("whisper-1", audio_file)
         except Exception as e:
             print(e)
             return ''
-
         return result['text'].strip()
