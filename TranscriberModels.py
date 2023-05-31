@@ -24,11 +24,10 @@ class WhisperTranscriber:
     
 class APIWhisperTranscriber:
     def get_transcription(self, wav_file_path):
-        audio_file= open(wav_file_path, "rb")
         try:
-            result = openai.Audio.translate("whisper-1", audio_file)
+            with open(wav_file_path, "rb") as audio_file:
+                result = openai.Audio.translate("whisper-1", audio_file)
         except Exception as e:
             print(e)
             return ''
-
         return result['text'].strip()
