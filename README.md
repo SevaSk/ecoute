@@ -65,7 +65,7 @@ Please ensure that you run these commands in a PowerShell window with administra
       ```
       OPENAI_API_KEY="API KEY"
       ```
-   Replace "API KEY" with your actual OpenAI API key. Save this file as keys.py within the ecoute directory.
+      Replace "API KEY" with your actual OpenAI API key. Save this file as keys.py within the ecoute directory.
 
 ### 🎬 Running Ecoute
 
