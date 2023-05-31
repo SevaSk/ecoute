@@ -25,10 +25,7 @@ class WhisperTranscriber:
     
     def change_lang(self, language):
         self.lang = language
-        if self.lang == "en":
-            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
-        else:
-            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.pt'))    
+        self.load_model() 
        
     def load_model(self):
          if self.lang == "en":
