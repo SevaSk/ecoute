@@ -48,10 +48,11 @@ class AudioTranscriber:
 
             text = ''
             temp_file = NamedTemporaryFile(delete=False, suffix=".wav")
+            temp_file.close()
+
             source_info["process_data_func"](source_info["last_sample"], temp_file.name)
             text = self.audio_model.get_transcription(temp_file.name)
 
-            temp_file.close()
             os.unlink(temp_file.name)
 
             if text != '' and text.lower() != 'you':
@@ -94,8 +95,6 @@ class AudioTranscriber:
         else:
             transcript[0] = (f"{who_spoke}: [{text}]\n\n", time_spoken)
     
-  
-
     def get_transcript(self):
         combined_transcript = list(merge(
             self.transcript_data["You"], self.transcript_data["Speaker"], 
