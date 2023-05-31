@@ -12,7 +12,7 @@ def get_model(use_api):
 class WhisperTranscriber:
     def __init__(self):
         self.lang = "en"
-        self.audio_model = self.change_lang(self.lang)
+        self.audio_model = self.load_model()
         print(f"[INFO] Whisper using GPU: " + str(torch.cuda.is_available()))
 
     def get_transcription(self, wav_file_path):
@@ -27,8 +27,14 @@ class WhisperTranscriber:
         self.lang = language
         if self.lang == "en":
             self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
-            return self.audio_model
         else:
+            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.pt'))    
+       
+    def load_model(self):
+         if self.lang == "en":
+            self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
+            return self.audio_model
+         else:
             self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.pt'))
             return self.audio_model 
 
