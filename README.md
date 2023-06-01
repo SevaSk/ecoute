@@ -5,7 +5,7 @@ Ecoute is a live transcription tool that provides real-time transcripts for both
 
 ## 📖 Demo
 
-https://github.com/SevaSk/ecoute/assets/50382291/8ac48927-8a26-49fd-80e9-48f980986208
+<https://github.com/SevaSk/ecoute/assets/50382291/8ac48927-8a26-49fd-80e9-48f980986208>
 
 Ecoute is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3.5, Ecoute aims to make communication more efficient and enjoyable.
 
@@ -15,21 +15,25 @@ Follow these steps to set up and run Ecoute on your local machine.
 
 ### 📋 Prerequisites
 
-- Python 3.x
+- Python >=3.8.0
 - An OpenAI API key
 - Windows OS (Not tested on others)
-- FFmpeg 
+- FFmpeg
 
 If FFmpeg is not installed in your system, you can follow the steps below to install it.
 
 First, you need to install Chocolatey, a package manager for Windows. Open your PowerShell as Administrator and run the following command:
+
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 ```
+
 Once Chocolatey is installed, you can install FFmpeg by running the following command in your PowerShell:
+
 ```
 choco install ffmpeg-full
 ```
+
 Please ensure that you run these commands in a PowerShell window with administrator privileges. If you face any issues during the installation, you can visit the official Chocolatey and FFmpeg websites for troubleshooting.
 
 ### 🔧 Installation
@@ -51,7 +55,7 @@ Please ensure that you run these commands in a PowerShell window with administra
    ```
    pip install -r requirements.txt
    ```
-   
+
 4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
 
    - Option 1: You can utilize a command on your command prompt. Run the following command, ensuring to replace "API KEY" with your actual OpenAI API key:
@@ -61,10 +65,11 @@ Please ensure that you run these commands in a PowerShell window with administra
       ```
 
    - Option 2: You can create the keys.py file manually. Open up your text editor of choice and enter the following content:
-   
+
       ```
       OPENAI_API_KEY="API KEY"
       ```
+
       Replace "API KEY" with your actual OpenAI API key. Save this file as keys.py within the ecoute directory.
 
 ### 🎬 Running Ecoute
@@ -102,3 +107,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to open issues or submit pull requests to improve Ecoute.
+
+### Installation
+
+1. `make venv`
+2. Activate the venv: `ecout_venv`
+3. `make install`
+
+### Code quality
+
+Before submitting a pull request run `make precommit` and resolve any issues. Additionally, here are some useful commands:
+
+- `make lint`
+- `make format`

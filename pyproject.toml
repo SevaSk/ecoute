@@ -1,0 +1,8 @@
+[tool.ruff]
+select = [
+    # "E", # pycodestyle
+    "F", # pyflakes
+    "I", # isort
+    "UP", # pyupgrade
+]
+src = ["."]

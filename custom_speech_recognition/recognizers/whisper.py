@@ -9,19 +9,22 @@ from custom_speech_recognition.exceptions import SetupError
 
 def recognize_whisper_api(
     recognizer,
-    audio_data: "AudioData",
+    audio_data: AudioData,
     *,
     model: str = "whisper-1",
     api_key: str | None = None,
 ):
     """
-    Performs speech recognition on ``audio_data`` (an ``AudioData`` instance), using the OpenAI Whisper API.
+    Performs speech recognition on ``audio_data`` (an ``AudioData`` instance),
+    using the OpenAI Whisper API.
 
-    This function requires an OpenAI account; visit https://platform.openai.com/signup, then generate API Key in `User settings <https://platform.openai.com/account/api-keys>`__.
+    This function requires an OpenAI account; visit https://platform.openai.com/signup,
+    then generate API Key in `User settings <https://platform.openai.com/account/api-keys>`__.
 
     Detail: https://platform.openai.com/docs/guides/speech-to-text
 
-    Raises a ``speech_recognition.exceptions.SetupError`` exception if there are any issues with the openai installation, or the environment variable is missing.
+    Raises a ``speech_recognition.exceptions.SetupError`` exception if there are any
+    issues with the openai installation, or the environment variable is missing.
     """
     if not isinstance(audio_data, AudioData):
         raise ValueError("``audio_data`` must be an ``AudioData`` instance")
