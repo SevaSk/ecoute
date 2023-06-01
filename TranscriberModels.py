@@ -30,11 +30,9 @@ class WhisperTranscriber:
     def load_model(self):
          if self.lang == "en":
             self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.en.pt'))
-            return self.audio_model
          else:
             self.audio_model = whisper.load_model(os.path.join(os.getcwd(), 'tiny.pt'))
-            return self.audio_model 
-
+             
 class APIWhisperTranscriber:
     def get_transcription(self, wav_file_path):
         try:
