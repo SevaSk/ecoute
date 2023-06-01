@@ -47,7 +47,11 @@ class AudioTranscriber:
             source_info = self.audio_sources[who_spoke]
 
             text = ''
-            temp_file = NamedTemporaryFile(delete=False, suffix=".wav")
+            try:
+                temp_file = NamedTemporaryFile(delete=False, suffix=".wav")
+            except Exception as e:
+                print(e)
+
             temp_file.close()
 
             source_info["process_data_func"](source_info["last_sample"], temp_file.name)
