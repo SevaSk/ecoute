@@ -49,10 +49,11 @@ class AudioTranscriber:
 
             text = ""
             temp_file = NamedTemporaryFile(delete=False, suffix=".wav")
+            temp_file.close()
+
             source_info["process_data_func"](source_info["last_sample"], temp_file.name)
             text = self.audio_model.get_transcription(temp_file.name)
 
-            temp_file.close()
             os.unlink(temp_file.name)
 
             if text != "" and text.lower() != "you":
