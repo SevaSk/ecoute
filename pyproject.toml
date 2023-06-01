@@ -1,3 +1,6 @@
+[tool.black]
+exclude = ["custom_speech_recognition"]
+
 [tool.ruff]
 select = [
     # "E", # pycodestyle
@@ -6,3 +9,4 @@ select = [
     "UP", # pyupgrade
 ]
 src = ["."]
+exclude = ["custom_speech_recognition"]
