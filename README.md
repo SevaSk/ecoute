@@ -158,7 +158,7 @@ To set up the environment and install the necessary dependencies, follow these s
    make install
    ```
 
-### Code quality
+### Code Quality
 
 Before submitting a pull request run `make precommit` and resolve any issues. Additionally, here are some useful commands:
 
