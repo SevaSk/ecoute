@@ -15,7 +15,7 @@ precommit:
 	make format
 
 venv:
-	python3 -m venv ecout_env
+	python -m venv ecout_env
 
 install:
 	pip install -r requirements.txt

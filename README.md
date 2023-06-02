@@ -110,9 +110,53 @@ Contributions are welcome! Feel free to open issues or submit pull requests to i
 
 ### Installation
 
-1. `make venv`
-2. Activate the venv: `ecout_venv`
-3. `make install`
+To set up the environment and install the necessary dependencies, follow these steps based on your operating system.
+
+#### Windows
+
+1. Install make on your Windows machine.
+
+   ```shell
+   choco install make
+   ```
+
+2. Create a virtual environment:
+
+   ```shell
+   make venv
+   ```
+
+3. Activate the virtual environment:
+
+   ```shell
+   .\ecout_venv\Scripts\activate
+   ```
+
+4. Install the required packages:
+
+   ```shell
+   make install
+   ```
+
+#### Linux & MacOS
+
+1. Create a virtual environment:
+
+   ```shell
+   make venv
+   ```
+
+2. Activate the virtual environment by running the command:
+
+   ```shell
+   source ecout_venv/bin/activate
+   ```
+
+3. Install the required python packages:
+
+   ```shell
+   make install
+   ```
 
 ### Code quality
 
