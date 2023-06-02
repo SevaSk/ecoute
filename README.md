@@ -75,7 +75,7 @@ Run the main script:
 python main.py
 ```
 
-For a better and faster version, use:
+For a more better and faster version that also works with most languages, use:
 
 ```
 python main.py --api
