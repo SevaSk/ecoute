@@ -83,9 +83,11 @@ def main():
     speaker_audio_recorder.record_into_queue(audio_queue)
 
     model = TranscriberModels.get_model('--api' in sys.argv)
-    combobox.configure(command=model.change_lang)
+    if '--api' in sys.argv:
+        combobox.destroy()
+    else:    
+        combobox.configure(command=model.change_lang)
     
-
     transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source, model)
     transcribe = threading.Thread(target=transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.daemon = True
