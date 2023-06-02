@@ -3,7 +3,7 @@ import torch
 import wave
 import os
 import threading
-from tempfile import NamedTemporaryFile
+import tempfile
 import custom_speech_recognition as sr
 import io
 from datetime import timedelta
@@ -48,16 +48,14 @@ class AudioTranscriber:
 
             text = ''
             try:
-                temp_file = NamedTemporaryFile(delete=False, suffix=".wav")
+                fd, path = tempfile.mkstemp(suffix=".wav")
+                os.close(fd)
+                source_info["process_data_func"](source_info["last_sample"], path)
+                text = self.audio_model.get_transcription(path)
             except Exception as e:
                 print(e)
-
-            temp_file.close()
-
-            source_info["process_data_func"](source_info["last_sample"], temp_file.name)
-            text = self.audio_model.get_transcription(temp_file.name)
-
-            os.unlink(temp_file.name)
+            finally:
+                os.unlink(path)
 
             if text != '' and text.lower() != 'you':
                 self.update_transcript(who_spoke, text, time_spoken)
