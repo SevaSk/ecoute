@@ -8,6 +8,7 @@ import time
 import torch
 import sys
 import TranscriberModels
+import subprocess
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
@@ -65,6 +66,12 @@ def create_ui_components(root):
     return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
 
 def main():
+    try:
+        subprocess.run(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except FileNotFoundError:
+        print("ERROR: The ffmpeg library is not installed. Please install ffmpeg and try again.")
+        return
+
     root = ctk.CTk()
     transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button = create_ui_components(root)
 

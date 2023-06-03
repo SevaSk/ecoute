@@ -28,7 +28,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ```
 Once Chocolatey is installed, you can install FFmpeg by running the following command in your PowerShell:
 ```
-choco install ffmpeg-full
+choco install ffmpeg
 ```
 Please ensure that you run these commands in a PowerShell window with administrator privileges. If you face any issues during the installation, you can visit the official Chocolatey and FFmpeg websites for troubleshooting.
 
