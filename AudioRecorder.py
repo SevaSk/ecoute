@@ -1,5 +1,6 @@
 import custom_speech_recognition as sr
-import pyaudiowpatch as pyaudio
+#import pyaudiowpatch as pyaudio
+import pyaudio
 from datetime import datetime
 
 RECORD_TIMEOUT = 3
@@ -38,18 +39,33 @@ class DefaultMicRecorder(BaseRecorder):
 
 class DefaultSpeakerRecorder(BaseRecorder):
     def __init__(self):
-        with pyaudio.PyAudio() as p:
-            wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
+        #with pyaudio.PyAudio() as p:
+        p = pyaudio.PyAudio() 
+        try:
+            #wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
+            wasapi_info = p.get_host_api_info_by_type(pyaudio.paCoreAudio)
+
             default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
             
-            if not default_speakers["isLoopbackDevice"]:
-                for loopback in p.get_loopback_device_info_generator():
-                    if default_speakers["name"] in loopback["name"]:
-                        default_speakers = loopback
+            #if not default_speakers["isLoopbackDevice"]:
+            if not default_speakers.get("isLoopbackDevice", False):
+                
+                for i in range(p.get_device_count()):
+                    device_info = p.get_device_info_by_index(i)
+                    if device_info['maxInputChannels'] > 0 and device_info['hostApi'] == p.get_default_host_api_info()['index']:
+                        default_speakers = loopback = device_info
                         break
-                else:
-                    print("[ERROR] No loopback device found.")
-        
+                    else:
+                        print("[ERROR] No loopback device found.")
+
+                # for loopback in p.get_loopback_device_info_generator():
+                #     if default_speakers["name"] in loopback["name"]:
+                #         default_speakers = loopback
+                #         break
+                # else:
+                #     print("[ERROR] No loopback device found.")
+        finally:
+            p.terminate()
         source = sr.Microphone(speaker=True,
                                device_index= default_speakers["index"],
                                sample_rate=int(default_speakers["defaultSampleRate"]),
