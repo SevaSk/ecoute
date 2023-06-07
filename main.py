@@ -8,6 +8,7 @@ import time
 import torch
 import sys
 import TranscriberModels
+from language import LANGUAGES
 import subprocess
 
 def write_in_textbox(textbox, text):
@@ -63,7 +64,10 @@ def create_ui_components(root):
     update_interval_slider.set(2)
     update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
 
-    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
+    combobox = ctk.CTkOptionMenu(root, values=list(LANGUAGES.values()))                                  
+    combobox.grid(row=3, column=0, padx=200, pady=10, sticky="nsew")                                   
+                                        
+    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button, combobox
 
 def main():
     try:
@@ -73,7 +77,7 @@ def main():
         return
 
     root = ctk.CTk()
-    transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button = create_ui_components(root)
+    transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button, combobox = create_ui_components(root)
 
     audio_queue = queue.Queue()
 
@@ -86,7 +90,11 @@ def main():
     speaker_audio_recorder.record_into_queue(audio_queue)
 
     model = TranscriberModels.get_model('--api' in sys.argv)
-
+    if '--api' in sys.argv:
+        combobox.destroy()
+    else:    
+        combobox.configure(command=model.change_lang)
+    
     transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source, model)
     transcribe = threading.Thread(target=transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.daemon = True

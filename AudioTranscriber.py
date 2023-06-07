@@ -96,7 +96,7 @@ class AudioTranscriber:
             transcript.insert(0, (f"{who_spoke}: [{text}]\n\n", time_spoken))
         else:
             transcript[0] = (f"{who_spoke}: [{text}]\n\n", time_spoken)
-
+    
     def get_transcript(self):
         combined_transcript = list(merge(
             self.transcript_data["You"], self.transcript_data["Speaker"], 
