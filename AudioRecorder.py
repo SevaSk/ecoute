@@ -1,7 +1,12 @@
 import custom_speech_recognition as sr
-#import pyaudiowpatch as pyaudio
-import pyaudio
+import os
 from datetime import datetime
+
+if os.name == "nt":
+    import pyaudiowpatch as pyaudio
+else:
+    import pyaudio
+
 
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
@@ -42,28 +47,34 @@ class DefaultSpeakerRecorder(BaseRecorder):
         #with pyaudio.PyAudio() as p:
         p = pyaudio.PyAudio() 
         try:
-            #wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-            wasapi_info = p.get_host_api_info_by_type(pyaudio.paCoreAudio)
+            if os.name == "nt":
+                wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
+            else:
+                wasapi_info = p.get_host_api_info_by_type(pyaudio.paCoreAudio)
 
             default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
-            
-            #if not default_speakers["isLoopbackDevice"]:
-            if not default_speakers.get("isLoopbackDevice", False):
-                
-                for i in range(p.get_device_count()):
-                    device_info = p.get_device_info_by_index(i)
-                    if device_info['maxInputChannels'] > 0 and device_info['hostApi'] == p.get_default_host_api_info()['index']:
-                        default_speakers = loopback = device_info
-                        break
+            isLoopbackDevice = False
+            if os.name == "nt":
+                isLoopbackDevice = default_speakers["isLoopbackDevice"]
+            else:
+                isLoopbackDevice = default_speakers.get("isLoopbackDevice", False)
+            if not isLoopbackDevice:
+                if os.name != "nt":
+                    for i in range(p.get_device_count()):
+                        device_info = p.get_device_info_by_index(i)
+                        if device_info['maxInputChannels'] > 0 and device_info['hostApi'] == p.get_default_host_api_info()['index']:
+                            default_speakers = loopback = device_info
+                            break
+                        else:
+                            print("[ERROR] No loopback device found.")
+
+                else:
+                    for loopback in p.get_loopback_device_info_generator():
+                        if default_speakers["name"] in loopback["name"]:
+                            default_speakers = loopback
+                            break
                     else:
                         print("[ERROR] No loopback device found.")
-
-                # for loopback in p.get_loopback_device_info_generator():
-                #     if default_speakers["name"] in loopback["name"]:
-                #         default_speakers = loopback
-                #         break
-                # else:
-                #     print("[ERROR] No loopback device found.")
         finally:
             p.terminate()
         source = sr.Microphone(speaker=True,
