@@ -8,10 +8,9 @@ import custom_speech_recognition as sr
 import io
 from datetime import timedelta
 from heapq import merge
-
-if os.name == "nt":
-    import pyaudiowpatch as pyaudio
-else:
+try:
+    import pyaudiowpatch as pyaudio 
+except ImportError:
     import pyaudio
 
 

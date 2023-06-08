@@ -1,12 +1,10 @@
 import custom_speech_recognition as sr
 import os
 from datetime import datetime
-
-if os.name == "nt":
+try:
     import pyaudiowpatch as pyaudio
-else:
+except ImportError:
     import pyaudio
-
 
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
@@ -49,10 +47,11 @@ class DefaultSpeakerRecorder(BaseRecorder):
         try:
             if os.name == "nt":
                 wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
+                default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
             else:
-                wasapi_info = p.get_host_api_info_by_type(pyaudio.paCoreAudio)
+                codeaudio_info = p.get_host_api_info_by_type(pyaudio.paCoreAudio)
+                default_speakers = p.get_device_info_by_index(codeaudio_info["defaultOutputDevice"])
 
-            default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
             isLoopbackDevice = False
             if os.name == "nt":
                 isLoopbackDevice = default_speakers["isLoopbackDevice"]
