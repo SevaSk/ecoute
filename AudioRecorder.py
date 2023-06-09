@@ -1,6 +1,14 @@
 import custom_speech_recognition as sr
-import pyaudiowpatch as pyaudio
+import os
 from datetime import datetime
+
+try:
+    import pyaudiowpatch as pyaudio
+except ImportError:
+    if os.name != "nt":
+        import pyaudio
+    else:
+        raise
 
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
@@ -37,23 +45,44 @@ class DefaultMicRecorder(BaseRecorder):
         self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
 
 class DefaultSpeakerRecorder(BaseRecorder):
-    def __init__(self):
-        with pyaudio.PyAudio() as p:
-            wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-            default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
-            
-            if not default_speakers["isLoopbackDevice"]:
-                for loopback in p.get_loopback_device_info_generator():
-                    if default_speakers["name"] in loopback["name"]:
-                        default_speakers = loopback
-                        break
-                else:
+    
+    # Different implementations of obtaining the info dict of a default speaker, for different platforms
+    if os.name == "nt":
+        def _get_default_speaker(self):
+            # Requires PyAudioWPatch >= 0.2.12.6
+            with pyaudio.PyAudio() as p:
+                try:
+                    # Get loopback of default WASAPI speaker
+                    return p.get_default_wasapi_loopback()
+        
+                except OSError:                
+                    print("[ERROR] Looks like WASAPI is not available on the system.")
+        
+                except LookupError:
                     print("[ERROR] No loopback device found.")
+    
+    else:
+        def _get_default_speaker(self):
+            # At the moment, recording from speakers is only available under Windows
+            # raise NotImplementedError("Recording from speakers is only available under Windows")
+            
+            # As far as I understand, now the code style does not provide
+            # for error handling - only print them.
+            print("[ERROR] Recording from speakers is only available under Windows.")
+
+            
+    def __init__(self):
+        default_speaker = self._get_default_speaker()
+        
+        if not default_speaker:
+            print("[ERROR] Something went wrong while trying to get the default speakers.")
+            super().__init__(source=sr.Microphone(sample_rate=16000), source_name="Speaker")
+            return
         
         source = sr.Microphone(speaker=True,
-                               device_index= default_speakers["index"],
-                               sample_rate=int(default_speakers["defaultSampleRate"]),
+                               device_index=default_speaker["index"],
+                               sample_rate=int(default_speaker["defaultSampleRate"]),
                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
-                               channels=default_speakers["maxInputChannels"])
+                               channels=default_speaker["maxInputChannels"])
         super().__init__(source=source, source_name="Speaker")
         self.adjust_for_noise("Default Speaker", "Please make or play some noise from the Default Speaker...")
