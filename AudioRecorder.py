@@ -48,7 +48,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
     
     # Different implementations of obtaining the info dict of a default speaker, for different platforms
     if os.name == "nt":
-        def _get_default_speaker():
+        def _get_default_speaker(self):
             # Requires PyAudioWPatch >= 0.2.12.6
             with pyaudio.PyAudio() as p:
                 try:
@@ -61,18 +61,26 @@ class DefaultSpeakerRecorder(BaseRecorder):
                 except LookupError:
                     print("[ERROR] No loopback device found.")
     else:
-        def _get_default_speaker():
+        def _get_default_speaker(self):
             # At the moment, recording from speakers is only available under Windows
             # raise NotImplementedError("Recording from speakers is only available under Windows")
             
             # As far as I understand, now the code style does not provide
             # for error handling - only print them.
             print("[ERROR] Recording from speakers is only available under Windows.")
+            p = pyaudio.PyAudio()
+            
+            try:
+                # This just a stub
+                return p.get_default_output_device_info()
+            finally:
+                p.terminate()
             
     def __init__(self):
         default_speaker = self._get_default_speaker()
         
         if not default_speaker:
+            print("[ERROR] Something went wrong while trying to get the default speakers.")
             return
         
         source = sr.Microphone(speaker=True,
