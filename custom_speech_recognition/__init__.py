@@ -107,9 +107,12 @@ class Microphone(AudioSource):
         Imports the pyaudio module and checks its version. Throws exceptions if pyaudio can't be found or a wrong version is installed
         """
         try:
-            import pyaudiowpatch as pyaudio 
+            import pyaudiowpatch as pyaudio
         except ImportError:
-            import pyaudio
+            if os.name != "nt":
+                import pyaudio
+            else:
+                raise
         from distutils.version import LooseVersion
         if LooseVersion(pyaudio.__version__) < LooseVersion("0.2.11"):
             raise AttributeError("PyAudio 0.2.11 or later is required (found version {})".format(pyaudio.__version__))
