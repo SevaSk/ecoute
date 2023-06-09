@@ -60,6 +60,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
         
                 except LookupError:
                     print("[ERROR] No loopback device found.")
+    
     else:
         def _get_default_speaker(self):
             # At the moment, recording from speakers is only available under Windows
@@ -68,19 +69,14 @@ class DefaultSpeakerRecorder(BaseRecorder):
             # As far as I understand, now the code style does not provide
             # for error handling - only print them.
             print("[ERROR] Recording from speakers is only available under Windows.")
-            p = pyaudio.PyAudio()
-            
-            try:
-                # This just a stub
-                return p.get_default_output_device_info()
-            finally:
-                p.terminate()
+
             
     def __init__(self):
         default_speaker = self._get_default_speaker()
         
         if not default_speaker:
             print("[ERROR] Something went wrong while trying to get the default speakers.")
+            super().__init__(source=sr.Microphone(sample_rate=16000), source_name="StubAudio")
             return
         
         source = sr.Microphone(speaker=True,
