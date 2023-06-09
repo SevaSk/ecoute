@@ -76,7 +76,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
         
         if not default_speaker:
             print("[ERROR] Something went wrong while trying to get the default speakers.")
-            super().__init__(source=sr.Microphone(sample_rate=16000), source_name="StubAudio")
+            super().__init__(source=sr.Microphone(sample_rate=16000), source_name="Speaker")
             return
         
         source = sr.Microphone(speaker=True,
