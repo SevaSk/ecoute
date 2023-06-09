@@ -8,10 +8,14 @@ import custom_speech_recognition as sr
 import io
 from datetime import timedelta
 from heapq import merge
+
 try:
-    import pyaudiowpatch as pyaudio 
+    import pyaudiowpatch as pyaudio
 except ImportError:
-    import pyaudio
+    if os.name != "nt":
+        import pyaudio
+    else:
+        raise
 
 
 PHRASE_TIMEOUT = 3.05
