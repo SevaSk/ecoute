@@ -60,7 +60,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
         
                 except LookupError:
                     print("[ERROR] No loopback device found.")
-   else:
+    else:
         def _get_default_speaker():
             # At the moment, recording from speakers is only available under Windows
             # raise NotImplementedError("Recording from speakers is only available under Windows")
