@@ -1,8 +1,11 @@
 import openai
-from keys import OPENAI_API_KEY
+from keys import OPENAI_API_KEY, ACCESS_TOKEN
 from prompts import create_prompt, INITIAL_RESPONSE
 import time
-
+from revChatGPT.V1 import Chatbot
+chatbot = Chatbot(config={
+  "access_token": f"{ACCESS_TOKEN}"
+})
 openai.api_key = OPENAI_API_KEY
 
 def generate_response_from_transcript(transcript):
@@ -22,9 +25,10 @@ def generate_response_from_transcript(transcript):
         return ''
     
 class GPTResponder:
-    def __init__(self):
+    def __init__(self, revChatGPT):
         self.response = INITIAL_RESPONSE
         self.response_interval = 2
+        self.revChatGPT = revChatGPT
 
     def respond_to_transcriber(self, transcriber):
         while True:
@@ -33,7 +37,13 @@ class GPTResponder:
 
                 transcriber.transcript_changed_event.clear() 
                 transcript_string = transcriber.get_transcript()
-                response = generate_response_from_transcript(transcript_string)
+                if self.revChatGPT:
+                    for data in chatbot.ask(
+                    create_prompt(transcript_string)
+                    ):
+                        response = data["message"]
+                else:
+                    response = generate_response_from_transcript(transcript_string)
                 
                 end_time = time.time()  # Measure end time
                 execution_time = end_time - start_time  # Calculate the time it took to execute the function
