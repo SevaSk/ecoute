@@ -92,7 +92,7 @@ def main():
     transcribe.daemon = True
     transcribe.start()
 
-    responder = GPTResponder(revChatGPT=True) if '--revChatGPT' in sys.argv else GPTResponder(revChatGPT=False)
+    responder = GPTResponder(revChatGPT=True) if '--revChatGPT' in sys.argv else GPTResponder()
     respond = threading.Thread(target=responder.respond_to_transcriber, args=(transcriber,))
     respond.daemon = True
     respond.start()
