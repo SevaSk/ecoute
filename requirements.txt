@@ -1,3 +1,6 @@
+black
+ruff
+pip-audit
 numpy==1.24.3
 openai-whisper==20230314
 Wave==0.0.2
