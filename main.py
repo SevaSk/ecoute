@@ -102,6 +102,12 @@ def create_ui_components(root):
 
 
 def main():
+    try:
+        subprocess.run(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except FileNotFoundError:
+        print("ERROR: The ffmpeg library is not installed. Please install ffmpeg and try again.")
+        return
+
     root = ctk.CTk()
     (
         transcript_textbox,
