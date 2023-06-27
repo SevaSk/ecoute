@@ -2,3 +2,5 @@ __pycache__/
 *.wav
 keys.py
 .venv/
+.DS_Store
+ecout_env
