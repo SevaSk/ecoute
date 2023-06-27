@@ -10,6 +10,15 @@ import pyaudiowpatch as pyaudio
 
 import custom_speech_recognition as sr
 
+try:
+    import pyaudiowpatch as pyaudio
+except ImportError:
+    if os.name != "nt":
+        import pyaudio
+    else:
+        raise
+
+
 PHRASE_TIMEOUT = 3.05
 
 MAX_PHRASES = 10
