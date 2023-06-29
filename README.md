@@ -81,9 +81,9 @@ The --api flag will use the whisper api for transcriptions. This significantly e
 
 ### ⚠️ Limitations
 
-While Transcribe provides real-time transcription and optional response suggestions, there are several known limitations to its functionality that you should be aware of:
+Transcribe provides real-time transcription and optional response suggestions, there are several known limitations to its functionality that you should be aware of:
 
-**Default Mic and Speaker:** Transcribe is currently configured to listen only to the default microphone and speaker set in your system. It will not detect sound from other devices or systems. To use a different mic or speaker, need to set it as your default device in your system settings.
+**Default Mic and Speaker:** Transcribe is configured to listen only to the default microphone and speaker set. It does not detect sound from other devices or systems. To use a different mic or speaker, need to set it as your default device in your system settings.
 
 **Whisper Model**: If the --api flag is not used, we utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
 
