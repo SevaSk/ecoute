@@ -1,11 +1,7 @@
 
-# 🎧 Ecoute
+# 🎧 Transcribe
 
-Transcribe is a live transcription tool that provides real-time transcripts for the microphone input (You) and the speakers output (Speaker). It optionally generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
-
-## 📖 Demo
-
-Transcribe is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3.5, Transcribe aims to make communication more efficient and enjoyable.
+Transcribe is a live transcription tool that provides real-time transcripts for the microphone input (You) and the audio output (Speaker). It optionally generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
 
 ## 🚀 Getting Started
 
@@ -14,7 +10,7 @@ Follow these steps to set up and run transcribe on your local machine.
 ### 📋 Prerequisites
 
 - Python >=3.8.0
-- An OpenAI API key that can access OpenAI API (set up a paid account OpenAI account, required only if you desire it to prompt for suggested responses.)
+- (Optional) An OpenAI API key that can access OpenAI API (set up a paid account OpenAI account)
 - Windows OS (Not tested on others)
 - FFmpeg 
 
@@ -28,7 +24,7 @@ Once Chocolatey is installed, install FFmpeg by running the following command in
 ```
 choco install ffmpeg
 ```
-Please ensure that you run these commands in a PowerShell window with administrator privileges. For any issues during the installation, visit the official Chocolatey and FFmpeg websites for troubleshooting.
+Please run these commands in a PowerShell window with administrator privileges. For any issues during the installation, visit the official [Chocolatey](https://chocolatey.org/) and [FFmpeg](https://ffmpeg.org/) websites for troubleshooting.
 
 ### 🔧 Installation
 
@@ -50,7 +46,7 @@ Please ensure that you run these commands in a PowerShell window with administra
    pip install -r requirements.txt
    ```
    
-4. (Optional) Create a `keys.py` file in the transcribe directory and add OpenAI API key:
+4. (Optional) Replace the Open API key in `keys.py` file in the transcribe directory:
 
    - Option 1: Use command prompt. Run the following command, ensuring to replace "API KEY" with the actual OpenAI API key:
 
@@ -58,12 +54,12 @@ Please ensure that you run these commands in a PowerShell window with administra
       python -c "with open('keys.py', 'w', encoding='utf-8') as f: f.write('OPENAI_API_KEY=\"API KEY\"')"
       ```
 
-   - Option 2: Create the keys.py file manually. Open a text editor and enter the following content:
+   - Option 2: Replace the Open API key in keys.py file manually. Open in a text editor and enter the following content:
    
       ```
       OPENAI_API_KEY="API KEY"
       ```
-      Replace "API KEY" with the actual OpenAI API key. Save this file as keys.py within the transcribe directory.
+      Replace "API KEY" with the actual OpenAI API key. Save the file.
 
 ### 🎬 Running Transcribe
 
@@ -73,7 +69,7 @@ Run the main script:
 python main.py
 ```
 
-For a more better and faster version that also works with most languages, use:
+For a better and faster version that also works with most languages, use:
 
 ```
 python main.py --api
@@ -81,17 +77,22 @@ python main.py --api
 
 Upon initiation, Transcribe will begin transcribing microphone input and speaker output in real-time, optionally generating a suggested response based on the conversation. It might take a few seconds for the system to warm up before the transcription becomes real-time.
 
-The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). However, keep in mind that using the Whisper API consumes more OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile for your use case.
+The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). However, keep in mind, using the Whisper API consumes OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile for your use case.
 
 ### ⚠️ Limitations
 
-While Transcribe provides real-time transcription and response suggestions, there are several known limitations to its functionality that you should be aware of:
+While Transcribe provides real-time transcription and optional response suggestions, there are several known limitations to its functionality that you should be aware of:
 
 **Default Mic and Speaker:** Transcribe is currently configured to listen only to the default microphone and speaker set in your system. It will not detect sound from other devices or systems. To use a different mic or speaker, need to set it as your default device in your system settings.
 
 **Whisper Model**: If the --api flag is not used, we utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
 
-**Language**: If you are not using the --api flag the Whisper model used in Ecoute is set to English. As a result, it may not accurately transcribe non-English languages or dialects. 
+**OpenAI Account**: If a paid OpenAI account with a valid Open API Key is not used, the command window displays the following error message repeatedly, though the application behvaior is not impacted in any way
+```
+Incorrect API key provided: API_KEY. You can find your API key at https://platform.openai.com/account/api-keys.
+```
+
+**Language**: If you are not using the --api flag the Whisper model used in Transcribe is set to English. As a result, it may not accurately transcribe non-English languages or dialects. 
 
 ## 📖 License
 
