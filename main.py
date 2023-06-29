@@ -1,4 +1,6 @@
 import threading
+import argparse
+from argparse import RawTextHelpFormatter
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
 import customtkinter as ctk
@@ -66,6 +68,19 @@ def create_ui_components(root):
     return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
 
 def main():
+
+    # Set up all arguments
+    cmd_args = argparse.ArgumentParser(description='Command Line Arguments for Transcribe', formatter_class=RawTextHelpFormatter)
+    cmd_args.add_argument('-a', '--api', action='store_true',
+                          help='Use the online Open AI API for transcription.\
+                          \nThis option requires an API KEY and will consume Open AI credits.')
+    cmd_args.add_argument('-m', '--model', action='store', choices=['tiny', 'base', 'small'], default='tiny',
+                          help='Specify the model to use for transcription.'\
+                          '\nOpenAI has more models besides the ones specified above.'\
+                          '\nThose models are prohibitive to use on local machines because of memory requirements.'\
+                          '\nThis option is only applicable when not using the --api option.')
+    args = cmd_args.parse_args()
+
     try:
         subprocess.run(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except FileNotFoundError:
@@ -84,8 +99,7 @@ def main():
 
     speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
     speaker_audio_recorder.record_into_queue(audio_queue)
-
-    model = TranscriberModels.get_model('--api' in sys.argv)
+    model = TranscriberModels.get_model(args.api, model=args.model)
 
     transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source, model)
     transcribe = threading.Thread(target=transcriber.transcribe_audio_queue, args=(audio_queue,))
