@@ -31,7 +31,7 @@ class GPTResponder:
             if transcriber.transcript_changed_event.is_set():
                 start_time = time.time()
 
-                transcriber.transcript_changed_event.clear() 
+                transcriber.transcript_changed_event.clear()
                 transcript_string = transcriber.get_transcript()
                 response = generate_response_from_transcript(transcript_string)
                 
