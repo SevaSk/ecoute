@@ -1,18 +1,17 @@
-import whisper
-import torch
-import wave
 import os
 import threading
-import tempfile
-import custom_speech_recognition as sr
 import io
 from datetime import timedelta
+import wave
+import tempfile
+import whisper
+import torch
+import custom_speech_recognition as sr
 import pyaudiowpatch as pyaudio
 from heapq import merge
 
 PHRASE_TIMEOUT = 3.05
 
-MAX_PHRASES = 10
 
 class AudioTranscriber:
     def __init__(self, mic_source, speaker_source, model):
@@ -52,8 +51,8 @@ class AudioTranscriber:
                 os.close(fd)
                 source_info["process_data_func"](source_info["last_sample"], path)
                 text = self.audio_model.get_transcription(path)
-            except Exception as e:
-                print(e)
+            except Exception as exception:
+                print(exception)
             finally:
                 os.unlink(path)
 
@@ -91,19 +90,18 @@ class AudioTranscriber:
         transcript = self.transcript_data[who_spoke]
 
         if source_info["new_phrase"] or len(transcript) == 0:
-            if len(transcript) > MAX_PHRASES:
-                transcript.pop(-1)
-            transcript.insert(0, (f"{who_spoke}: [{text}]\n\n", time_spoken))
+            transcript.append((f"{who_spoke}: [{text}]\n\n", time_spoken))
         else:
-            transcript[0] = (f"{who_spoke}: [{text}]\n\n", time_spoken)
+            transcript.pop()
+            transcript.append((f"{who_spoke}: [{text}]\n\n", time_spoken))
 
-    def get_transcript(self):
+    def get_transcript(self, length: int = 0):
         combined_transcript = list(merge(
-            self.transcript_data["You"], self.transcript_data["Speaker"], 
-            key=lambda x: x[1], reverse=True))
-        combined_transcript = combined_transcript[:MAX_PHRASES]
+            self.transcript_data["You"], self.transcript_data["Speaker"],
+            key=lambda x: x[1], reverse=False))
+        combined_transcript = combined_transcript[-length:]
         return "".join([t[0] for t in combined_transcript])
-    
+
     def clear_transcript_data(self):
         self.transcript_data["You"].clear()
         self.transcript_data["Speaker"].clear()

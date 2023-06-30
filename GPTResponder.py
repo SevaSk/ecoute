@@ -4,23 +4,26 @@ from prompts import create_prompt, INITIAL_RESPONSE
 import time
 
 openai.api_key = OPENAI_API_KEY
+# Number of phrases to use for generating a response
+MAX_PHRASES = 10
 
 def generate_response_from_transcript(transcript):
     try:
         response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo-0301",
                 messages=[{"role": "system", "content": create_prompt(transcript)}],
-                temperature = 0.0
+                temperature=0.0
         )
-    except Exception as e:
-        print(e)
+    except Exception as exception:
+        print(exception)
         return ''
     full_response = response.choices[0].message.content
     try:
         return full_response.split('[')[1].split(']')[0]
     except:
         return ''
-    
+
+
 class GPTResponder:
     def __init__(self):
         self.response = INITIAL_RESPONSE
@@ -32,7 +35,7 @@ class GPTResponder:
                 start_time = time.time()
 
                 transcriber.transcript_changed_event.clear()
-                transcript_string = transcriber.get_transcript()
+                transcript_string = transcriber.get_transcript(length=MAX_PHRASES)
                 response = generate_response_from_transcript(transcript_string)
                 
                 end_time = time.time()  # Measure end time

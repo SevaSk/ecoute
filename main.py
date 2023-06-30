@@ -20,6 +20,7 @@ def write_in_textbox(textbox, text):
 def update_transcript_UI(transcriber, textbox):
     transcript_string = transcriber.get_transcript()
     write_in_textbox(textbox, transcript_string)
+    textbox.see("end")
     textbox.after(300, update_transcript_UI, transcriber, textbox)
 
 
@@ -89,9 +90,12 @@ def main():
                           help='Use the online Open AI API for transcription.\
                           \nThis option requires an API KEY and will consume Open AI credits.')
     cmd_args.add_argument('-m', '--model', action='store', choices=['tiny', 'base', 'small'], default='tiny',
-                          help='Specify the model to use for transcription.'\
-                          '\nOpenAI has more models besides the ones specified above.'\
-                          '\nThose models are prohibitive to use on local machines because of memory requirements.'\
+                          help='Specify the model to use for transcription.'
+                          '\nBy default tiny model is part of the install.'
+                          '\nbase model has to be downloaded from the link https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
+                          '\nsmall model has to be downloaded from the link https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
+                          '\nOpenAI has more models besides the ones specified above.'
+                          '\nThose models are prohibitive to use on local machines because of memory requirements.'
                           '\nThis option is only applicable when not using the --api option.')
     args = cmd_args.parse_args()
 
@@ -118,6 +122,7 @@ def main():
     speaker_audio_recorder.record_into_queue(audio_queue)
     model = TranscriberModels.get_model(args.api, model=args.model)
 
+    # Transcribe and Respond threads, both work on the same instance of the AudioTranscriber class
     transcriber = AudioTranscriber(user_audio_recorder.source,
                                    speaker_audio_recorder.source, model)
     transcribe = threading.Thread(target=transcriber.transcribe_audio_queue,

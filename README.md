@@ -12,15 +12,6 @@ Follow these steps to set up and run transcribe on your local machine.
 - Python >=3.8.0
 - (Optional) An OpenAI API key that can access OpenAI API (set up a paid account OpenAI account)
 - Windows OS (Not tested on others)
-- Git LFS
-
-  Install [Git LFS](https://git-lfs.com/)
-  
-  Run the command
-  ```
-  git lfs install
-  ```
-
 - FFmpeg 
 
 If FFmpeg is not installed in your system, follow the steps below to install it.
@@ -100,6 +91,8 @@ While Transcribe provides real-time transcription and optional response suggesti
 ```
 Incorrect API key provided: API_KEY. You can find your API key at https://platform.openai.com/account/api-keys.
 ```
+
+**Models**: The default install of transcribe has the tiny(72 Mb) model. base (138 Mb), small (461 Mb) models can be downloaded and used for transcription by following instructions using transcribe command line. The larger models provide better quality transcription and they have higher memory requirements.
 
 **Language**: If you are not using the --api flag the Whisper model used in Transcribe is set to English. As a result, it may not accurately transcribe non-English languages or dialects. 
 
