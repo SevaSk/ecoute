@@ -1,5 +1,5 @@
 
-# 👂🏻️🏻 Transcribe ✍🏼️
+# 👂🏻️ Transcribe ✍🏼️
 
 Transcribe is a live transcription tool that provides real-time transcripts for the microphone input (You) and the audio output (Speaker). It optionally generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
 
@@ -103,7 +103,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## ➕ Enhancements from base repository ➕
 - Do not need Open AI key, paid Open AI account to use the complete functionality
 - Transcribe any video
-- Preserve all conversation text
+- Preserve all conversation text in UI
+- Allow saving conversation to file
 
 
 ## 🤝 Contributing 🤝

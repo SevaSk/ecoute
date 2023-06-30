@@ -4,7 +4,7 @@ from argparse import RawTextHelpFormatter
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
 import customtkinter as ctk
-import AudioRecorder 
+import AudioRecorder
 import queue
 import time
 import torch
@@ -40,7 +40,7 @@ def update_response_UI(responder, textbox, update_interval_slider_label,
                                                {update_interval} seconds")
 
     textbox.after(300, update_response_UI, responder, textbox,
-                  update_interval_slider_label, update_interval_slider, 
+                  update_interval_slider_label, update_interval_slider,
                   freeze_state)
 
 
@@ -82,10 +82,14 @@ def create_ui_components(root):
     copy_button = ctk.CTkButton(root, text="Copy", command=None)
     copy_button.grid(row=2, column=0, padx=10, pady=3, sticky="nsew")
 
+    save_file_button = ctk.CTkButton(root, text="Save to File", command=None)
+    save_file_button.grid(row=3, column=0, padx=10, pady=3, sticky="nsew")
+
     # Order of returned components is important. For adding new components add new components
     # to the end
     return [transcript_textbox, response_textbox, update_interval_slider,
-            update_interval_slider_label, freeze_button, copy_button]
+            update_interval_slider_label, freeze_button, copy_button,
+            save_file_button]
 
 
 def main():
@@ -123,6 +127,7 @@ def main():
     update_interval_slider_label = ui_components[3]
     freeze_button = ui_components[4]
     copy_button = ui_components[5]
+    save_file_button = ui_components[6]
 
     audio_queue = queue.Queue()
 
@@ -175,6 +180,13 @@ def main():
         pyperclip.copy(transcriber.get_transcript())
 
     copy_button.configure(command=copy_to_clipboard)
+
+    def save_file():
+        filename = ctk.filedialog.asksaveasfilename()
+        with open(file=filename, mode="w", encoding='utf-8') as file_handle:
+            file_handle.write(transcriber.get_transcript())
+
+    save_file_button.configure(command=save_file)
 
     update_interval_slider_label.configure(text=f"Update interval: \
                                           {update_interval_slider.get()} \
