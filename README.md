@@ -1,11 +1,11 @@
 
-# 🎧 Transcribe
+# 👂🏻️🏻 Transcribe ✍🏼️
 
 Transcribe is a live transcription tool that provides real-time transcripts for the microphone input (You) and the audio output (Speaker). It optionally generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
 
-## 🚀 Getting Started
+## 🆕 Getting Started 🥇
 
-Follow these steps to set up and run transcribe on your local machine.
+Follow below steps to run transcribe on your local machine.
 
 ### 📋 Prerequisites
 
@@ -28,7 +28,7 @@ Please run these commands in a PowerShell window with administrator privileges. 
 
 ### 🔧 Installation
 
-1. Clone the repository:
+1. Clone transcribe repository:
 
    ```
    git clone https://github.com/vivekuppal/transcribe
@@ -79,7 +79,7 @@ Upon initiation, Transcribe will begin transcribing microphone input and speaker
 
 The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). However, keep in mind, using the Whisper API consumes OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile for your use case.
 
-### ⚠️ Limitations
+### ⚡️ Limitations ⚡️
 
 While Transcribe provides real-time transcription and optional response suggestions, there are several known limitations to its functionality that you should be aware of:
 
@@ -96,10 +96,16 @@ Incorrect API key provided: API_KEY. You can find your API key at https://platfo
 
 **Language**: If you are not using the --api flag the Whisper model used in Transcribe is set to English. As a result, it may not accurately transcribe non-English languages or dialects. 
 
-## 📖 License
+## 👤 License 📖
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
+## ➕ Enhancements from base repository ➕
+- Do not need Open AI key, paid Open AI account to use the complete functionality
+- Transcribe any video
+- Preserve all conversation text
+
+
+## 🤝 Contributing 🤝
 
 Contributions are welcome! Feel free to open issues or submit pull requests to improve Transcribe.

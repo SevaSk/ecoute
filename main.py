@@ -10,6 +10,7 @@ import time
 import torch
 import TranscriberModels
 import subprocess
+import pyperclip
 
 
 def write_in_textbox(textbox, text):
@@ -78,7 +79,13 @@ def create_ui_components(root):
     update_interval_slider.set(2)
     update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
 
-    return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
+    copy_button = ctk.CTkButton(root, text="Copy", command=None)
+    copy_button.grid(row=2, column=0, padx=10, pady=3, sticky="nsew")
+
+    # Order of returned components is important. For adding new components add new components
+    # to the end
+    return [transcript_textbox, response_textbox, update_interval_slider,
+            update_interval_slider_label, freeze_button, copy_button]
 
 
 def main():
@@ -109,7 +116,13 @@ def main():
         return
 
     root = ctk.CTk()
-    transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button = create_ui_components(root)
+    ui_components = create_ui_components(root)
+    transcript_textbox = ui_components[0]
+    response_textbox = ui_components[1]
+    update_interval_slider = ui_components[2]
+    update_interval_slider_label = ui_components[3]
+    freeze_button = ui_components[4]
+    copy_button = ui_components[5]
 
     audio_queue = queue.Queue()
 
@@ -158,9 +171,14 @@ def main():
 
     freeze_button.configure(command=freeze_unfreeze)
 
+    def copy_to_clipboard():
+        pyperclip.copy(transcriber.get_transcript())
+
+    copy_button.configure(command=copy_to_clipboard)
+
     update_interval_slider_label.configure(text=f"Update interval: \
-                                           {update_interval_slider.get()} \
-                                            seconds")
+                                          {update_interval_slider.get()} \
+                                          seconds")
 
     update_transcript_UI(transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label,
