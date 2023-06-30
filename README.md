@@ -12,6 +12,15 @@ Follow these steps to set up and run transcribe on your local machine.
 - Python >=3.8.0
 - (Optional) An OpenAI API key that can access OpenAI API (set up a paid account OpenAI account)
 - Windows OS (Not tested on others)
+- Git LFS
+
+  Install [Git LFS](https://git-lfs.com/)
+  
+  Run the command
+  ```
+  git lfs install
+  ```
+
 - FFmpeg 
 
 If FFmpeg is not installed in your system, follow the steps below to install it.
@@ -81,9 +90,9 @@ The --api flag will use the whisper api for transcriptions. This significantly e
 
 ### ⚠️ Limitations
 
-Transcribe provides real-time transcription and optional response suggestions, there are several known limitations to its functionality that you should be aware of:
+While Transcribe provides real-time transcription and optional response suggestions, there are several known limitations to its functionality that you should be aware of:
 
-**Default Mic and Speaker:** Transcribe is configured to listen only to the default microphone and speaker set. It does not detect sound from other devices or systems. To use a different mic or speaker, need to set it as your default device in your system settings.
+**Default Mic and Speaker:** Transcribe is currently configured to listen only to the default microphone and speaker set in your system. It will not detect sound from other devices or systems. To use a different mic or speaker, need to set it as your default device in your system settings.
 
 **Whisper Model**: If the --api flag is not used, we utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
 

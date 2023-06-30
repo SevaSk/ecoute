@@ -15,13 +15,15 @@ def recognize_whisper_api(
     api_key: str | None = None,
 ):
     """
-    Performs speech recognition on ``audio_data`` (an ``AudioData`` instance), using the OpenAI Whisper API.
+    Perform speech recognition on ``audio_data`` (``AudioData`` instance), using OpenAI Whisper API.
 
-    This function requires an OpenAI account; visit https://platform.openai.com/signup, then generate API Key in `User settings <https://platform.openai.com/account/api-keys>`__.
+    This function requires an OpenAI account; visit https://platform.openai.com/signup, then generate
+    API Key in `User settings <https://platform.openai.com/account/api-keys>`__.
 
     Detail: https://platform.openai.com/docs/guides/speech-to-text
 
-    Raises a ``speech_recognition.exceptions.SetupError`` exception if there are any issues with the openai installation, or the environment variable is missing.
+    Raises a ``speech_recognition.exceptions.SetupError`` exception if there are any issues with the
+    openai installation, or the environment variable is missing.
     """
     if not isinstance(audio_data, AudioData):
         raise ValueError("``audio_data`` must be an ``AudioData`` instance")
@@ -31,9 +33,7 @@ def recognize_whisper_api(
     try:
         import openai
     except ImportError:
-        raise SetupError(
-            "missing openai module: ensure that openai is set up correctly."
-        )
+        raise SetupError("missing openai module: ensure that openai is set up correctly.")
 
     wav_data = BytesIO(audio_data.get_wav_data())
     wav_data.name = "SpeechRecognition_audio.wav"
