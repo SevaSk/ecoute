@@ -36,7 +36,7 @@ from urllib.error import URLError, HTTPError
 from .audio import AudioData, get_flac_converter
 from .exceptions import (
     RequestError,
-    TranscriptionFailed, 
+    TranscriptionFailed,
     TranscriptionNotReady,
     UnknownValueError,
     WaitTimeoutError,

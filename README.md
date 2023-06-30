@@ -102,6 +102,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ➕ Enhancements from base repository ➕
 - Do not need Open AI key, paid Open AI account to use the complete functionality
+- Allow contexttual information to provide customized responses to users
 - Transcribe any video
 - Preserve all conversation text in UI
 - Allow saving conversation to file

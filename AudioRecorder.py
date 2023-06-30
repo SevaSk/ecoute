@@ -6,6 +6,7 @@ RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
 DYNAMIC_ENERGY_THRESHOLD = False
 
+
 class BaseRecorder:
     def __init__(self, source, source_name):
         self.recorder = sr.Recognizer()
@@ -31,10 +32,12 @@ class BaseRecorder:
 
         self.recorder.listen_in_background(self.source, record_callback, phrase_time_limit=RECORD_TIMEOUT)
 
+
 class DefaultMicRecorder(BaseRecorder):
     def __init__(self):
         super().__init__(source=sr.Microphone(sample_rate=16000), source_name="You")
         self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
+
 
 class DefaultSpeakerRecorder(BaseRecorder):
     def __init__(self):

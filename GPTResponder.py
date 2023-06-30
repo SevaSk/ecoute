@@ -7,11 +7,13 @@ openai.api_key = OPENAI_API_KEY
 # Number of phrases to use for generating a response
 MAX_PHRASES = 10
 
+
 def generate_response_from_transcript(transcript):
     try:
+        prompt_content = create_prompt(transcript)
         response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo-0301",
-                messages=[{"role": "system", "content": create_prompt(transcript)}],
+                messages=[{"role": "system", "content": prompt_content}],
                 temperature=0.0
         )
     except Exception as exception:
