@@ -87,7 +87,7 @@ While Transcribe provides real-time transcription and optional response suggesti
 
 **Whisper Model**: If the --api flag is not used, we utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
 
-**OpenAI Account**: If a paid OpenAI account with a valid Open API Key is not used, the command window displays the following error message repeatedly, though the application behvaior is not impacted in any way
+**OpenAI Account**: If a paid OpenAI account with a valid Open API Key is not used, the command window displays the following error message repeatedly, though the application behvaior is not impacted in any way.
 ```
 Incorrect API key provided: API_KEY. You can find your API key at https://platform.openai.com/account/api-keys.
 ```
@@ -102,8 +102,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ➕ Enhancements from base repository ➕
 - Do not need Open AI key, paid Open AI account to use the complete functionality
-- Allow contexttual information to provide customized responses to users
-- Transcribe any video
+- Allow users to add contextual information to provide customized responses to conversation
+- Allow to pause audio transcription
+- Transcribe audio of any video
 - Preserve all conversation text in UI
 - Allow saving conversation to file
 

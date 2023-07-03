@@ -3,6 +3,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
+import prompts
 import customtkinter as ctk
 import AudioRecorder
 import queue
@@ -25,7 +26,7 @@ def update_transcript_UI(transcriber, textbox):
     textbox.after(300, update_transcript_UI, transcriber, textbox)
 
 
-def update_response_UI(responder, textbox, update_interval_slider_label, 
+def update_response_UI(responder, textbox, update_interval_slider_label,
                        update_interval_slider, freeze_state):
     if not freeze_state[0]:
         response = responder.response
@@ -66,8 +67,9 @@ def create_ui_components(root):
     response_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size),
                                       text_color='#639cdc', wrap="word")
     response_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="nsew")
+    response_textbox.insert("0.0", prompts.INITIAL_RESPONSE)
 
-    freeze_button = ctk.CTkButton(root, text="Freeze", command=None)
+    freeze_button = ctk.CTkButton(root, text="Suggest Response", command=None)
     freeze_button.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
 
     update_interval_slider_label = ctk.CTkLabel(root, text="", font=("Arial", 12),
@@ -82,14 +84,17 @@ def create_ui_components(root):
     copy_button = ctk.CTkButton(root, text="Copy Audio Transcript", command=None)
     copy_button.grid(row=2, column=0, padx=10, pady=3, sticky="nsew")
 
-    save_file_button = ctk.CTkButton(root, text="Save to File", command=None)
+    save_file_button = ctk.CTkButton(root, text="Save Audio Transcript to File", command=None)
     save_file_button.grid(row=3, column=0, padx=10, pady=3, sticky="nsew")
+
+    transcript_button = ctk.CTkButton(root, text="Pause Transcript", command=None)
+    transcript_button.grid(row=4, column=0, padx=10, pady=3, sticky="nsew")
 
     # Order of returned components is important. For adding new components add new components
     # to the end
     return [transcript_textbox, response_textbox, update_interval_slider,
             update_interval_slider_label, freeze_button, copy_button,
-            save_file_button]
+            save_file_button, transcript_button]
 
 
 def main():
@@ -100,7 +105,8 @@ def main():
     cmd_args.add_argument('-a', '--api', action='store_true',
                           help='Use the online Open AI API for transcription.\
                           \nThis option requires an API KEY and will consume Open AI credits.')
-    cmd_args.add_argument('-m', '--model', action='store', choices=['tiny', 'base', 'small'], default='tiny',
+    cmd_args.add_argument('-m', '--model', action='store', choices=['tiny', 'base', 'small'],
+                          default='tiny',
                           help='Specify the model to use for transcription.'
                           '\nBy default tiny model is part of the install.'
                           '\nbase model has to be downloaded from the link https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
@@ -127,6 +133,7 @@ def main():
     freeze_button = ui_components[4]
     copy_button = ui_components[5]
     save_file_button = ui_components[6]
+    transcript_button = ui_components[7]
 
     audio_queue = queue.Queue()
 
@@ -142,16 +149,16 @@ def main():
     # Transcribe and Respond threads, both work on the same instance of the AudioTranscriber class
     transcriber = AudioTranscriber(user_audio_recorder.source,
                                    speaker_audio_recorder.source, model)
-    transcribe = threading.Thread(target=transcriber.transcribe_audio_queue,
-                                  args=(audio_queue,))
-    transcribe.daemon = True
-    transcribe.start()
+    transcribe_thread = threading.Thread(target=transcriber.transcribe_audio_queue,
+                                         args=(audio_queue,))
+    transcribe_thread.daemon = True
+    transcribe_thread.start()
 
     responder = GPTResponder()
-    respond = threading.Thread(target=responder.respond_to_transcriber,
-                               args=(transcriber,))
-    respond.daemon = True
-    respond.start()
+    respond_thread = threading.Thread(target=responder.respond_to_transcriber,
+                                      args=(transcriber,))
+    respond_thread.daemon = True
+    respond_thread.start()
 
     print("READY")
 
@@ -163,15 +170,15 @@ def main():
     root.grid_columnconfigure(1, weight=1)
 
     # Add the clear transcript button to the UI
-    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript",
+    clear_transcript_button = ctk.CTkButton(root, text="Clear Audio Transcript",
                                             command=lambda: clear_context(transcriber, audio_queue))
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
-    freeze_state = [False]  # Using list to be able to change its content inside inner functions
+    freeze_state = [True]  # Using list to be able to change its content inside inner functions
 
     def freeze_unfreeze():
-        freeze_state[0] = not freeze_state[0]  # Invert the freeze state
-        freeze_button.configure(text="Unfreeze" if freeze_state[0] else "Freeze")
+        freeze_state[0] = not freeze_state[0]  # Invert the state
+        freeze_button.configure(text="Suggest Response" if freeze_state[0] else "Do Not Suggest Response")
 
     freeze_button.configure(command=freeze_unfreeze)
 
@@ -186,6 +193,12 @@ def main():
             file_handle.write(transcriber.get_transcript())
 
     save_file_button.configure(command=save_file)
+
+    def set_transcript_state():
+        transcriber.transcribe = not transcriber.transcribe
+        transcript_button.configure(text="Pause Transcript" if transcriber.transcribe else "Start Transcript")
+
+    transcript_button.configure(command=set_transcript_state)
 
     update_interval_slider_label.configure(text=f"Update interval: \
                                           {update_interval_slider.get()} \

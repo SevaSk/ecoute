@@ -59,4 +59,5 @@ class DefaultSpeakerRecorder(BaseRecorder):
                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
                                channels=default_speakers["maxInputChannels"])
         super().__init__(source=source, source_name="Speaker")
-        self.adjust_for_noise("Default Speaker", "Please make or play some noise from the Default Speaker...")
+        self.adjust_for_noise("Default Speaker",
+                              "Please make or play some noise from the Default Speaker...")

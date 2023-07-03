@@ -39,10 +39,10 @@ class GPTResponder:
                 transcriber.transcript_changed_event.clear()
                 transcript_string = transcriber.get_transcript(length=MAX_PHRASES)
                 response = generate_response_from_transcript(transcript_string)
-                
+
                 end_time = time.time()  # Measure end time
-                execution_time = end_time - start_time  # Calculate the time it took to execute the function
-                
+                execution_time = end_time - start_time  # Calculate time to execute the function
+
                 if response != '':
                     self.response = response
 
