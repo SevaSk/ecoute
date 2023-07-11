@@ -22,7 +22,7 @@ class WhisperTranscriber:
             print(f'Download the model file and add it to the directory: \
                   {os.getcwd()}')
             print('small model is available at: \
-                  https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link')
+                  https://drive.google.com/file/d/1vhtoZCwfYGi5C4jK1r-QVr5GobSBnKiH/view?usp=drive_link')
             print('base model is available at: \
                   https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link')
             exit()

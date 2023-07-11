@@ -110,7 +110,7 @@ def main():
                           help='Specify the model to use for transcription.'
                           '\nBy default tiny model is part of the install.'
                           '\nbase model has to be downloaded from the link https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
-                          '\nsmall model has to be downloaded from the link https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
+                          '\nsmall model has to be downloaded from the link https://drive.google.com/file/d/1vhtoZCwfYGi5C4jK1r-QVr5GobSBnKiH/view?usp=drive_link'
                           '\nOpenAI has more models besides the ones specified above.'
                           '\nThose models are prohibitive to use on local machines because of memory requirements.')
     args = cmd_args.parse_args()
