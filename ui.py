@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import AudioTranscriber
 import prompts
+from language import LANGUAGES
 
 
 def write_in_textbox(textbox: ctk.CTkTextbox, text: str):
@@ -91,6 +92,9 @@ def create_ui_components(root):
     save_file_button = ctk.CTkButton(root, text="Save Audio Transcript to File", command=None)
     save_file_button.grid(row=3, column=0, padx=10, pady=3, sticky="nsew")
 
+    lang_combobox = ctk.CTkOptionMenu(root, values=list(LANGUAGES.values()))
+    lang_combobox.grid(row=4, column=1, padx=200, pady=10, sticky="nsew")
+
     transcript_button = ctk.CTkButton(root, text="Pause Transcript", command=None)
     transcript_button.grid(row=4, column=0, padx=10, pady=3, sticky="nsew")
 
@@ -98,4 +102,4 @@ def create_ui_components(root):
     # Add new components to the end
     return [transcript_textbox, response_textbox, update_interval_slider,
             update_interval_slider_label, freeze_button, copy_button,
-            save_file_button, transcript_button]
+            save_file_button, lang_combobox, transcript_button]

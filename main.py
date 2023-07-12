@@ -15,6 +15,7 @@ import pyperclip
 import interactions
 import ui
 from requests.exceptions import ConnectionError
+from language import LANGUAGES
 
 
 def main():
@@ -27,11 +28,17 @@ def main():
     cmd_args.add_argument('-m', '--model', action='store', choices=['tiny', 'base', 'small'],
                           default='tiny',
                           help='Specify the model to use for transcription.'
-                          '\nBy default tiny model is part of the install.'
-                          '\nbase model has to be downloaded from the link \
+                          '\nBy default tiny english model is part of the install.'
+                          '\ntiny multi-lingual model has to be downloaded from the link \
+                            https://drive.google.com/file/d/1M4AFutTmQROaE9xk2jPc5Y4oFRibHhEh/view?usp=drive_link'
+                          '\nbase english model has to be downloaded from the link \
                             https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
-                          '\nsmall model has to be downloaded from the link \
+                          '\nbase multi-lingual model has to be downloaded from the link \
+                            https://drive.google.com/file/d/1UcqU_D0cPFqq_nckSfstMBfogFsvR-KR/view?usp=drive_link'
+                          '\nsmall english model has to be downloaded from the link \
                             https://drive.google.com/file/d/1vhtoZCwfYGi5C4jK1r-QVr5GobSBnKiH/view?usp=drive_link'
+                          '\nsmall multi-lingual model has to be downloaded from the link \
+                            https://drive.google.com/file/d/1bl8er_st8WPZKPWVeYMNlaUi9IzR3jEZ/view?usp=drive_link'
                           '\nOpenAI has more models besides the ones specified above.'
                           '\nThose models are prohibitive to use on local machines because \
                             of memory requirements.')
@@ -65,7 +72,8 @@ def main():
     freeze_button = ui_components[4]
     copy_button = ui_components[5]
     save_file_button = ui_components[6]
-    transcript_button = ui_components[7]
+    lang_combobox = ui_components[7]
+    transcript_button = ui_components[8]
 
     audio_queue = queue.Queue()
 
@@ -135,6 +143,8 @@ def main():
     update_interval_slider_label.configure(text=f"Update interval: \
                                           {update_interval_slider.get()} \
                                           seconds")
+
+    lang_combobox.configure(command=model.change_lang)
 
     ui.update_transcript_ui(transcriber, transcript_textbox)
     ui.update_response_ui(responder, response_textbox, update_interval_slider_label,
