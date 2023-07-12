@@ -1,104 +1,23 @@
 import threading
 import argparse
 from argparse import RawTextHelpFormatter
-from AudioTranscriber import AudioTranscriber
-from GPTResponder import GPTResponder
-import prompts
-import customtkinter as ctk
-import AudioRecorder
 import queue
 import time
+import requests
+from AudioTranscriber import AudioTranscriber
+from GPTResponder import GPTResponder
+import customtkinter as ctk
+import AudioRecorder
 import torch
 import TranscriberModels
 import subprocess
 import pyperclip
-
-
-def write_in_textbox(textbox, text):
-    textbox.delete("0.0", "end")
-    textbox.insert("0.0", text)
-
-
-def update_transcript_UI(transcriber, textbox):
-    transcript_string = transcriber.get_transcript()
-    write_in_textbox(textbox, transcript_string)
-    textbox.see("end")
-    textbox.after(300, update_transcript_UI, transcriber, textbox)
-
-
-def update_response_UI(responder, textbox, update_interval_slider_label,
-                       update_interval_slider, freeze_state):
-    if not freeze_state[0]:
-        response = responder.response
-
-        textbox.configure(state="normal")
-        write_in_textbox(textbox, response)
-        textbox.configure(state="disabled")
-
-        update_interval = int(update_interval_slider.get())
-        responder.update_response_interval(update_interval)
-        update_interval_slider_label.configure(text=f"Update interval: \
-                                               {update_interval} seconds")
-
-    textbox.after(300, update_response_UI, responder, textbox,
-                  update_interval_slider_label, update_interval_slider,
-                  freeze_state)
-
-
-def clear_context(transcriber, audio_queue):
-    transcriber.clear_transcript_data()
-    with audio_queue.mutex:
-        audio_queue.queue.clear()
-
-
-def create_ui_components(root):
-    ctk.set_appearance_mode("dark")
-    ctk.set_default_color_theme("dark-blue")
-    root.title("Transcribe")
-    root.configure(bg='#252422')
-    root.geometry("1000x600")
-
-    font_size = 20
-
-    transcript_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size),
-                                        text_color='#FFFCF2', wrap="word")
-    transcript_textbox.grid(row=0, column=0, padx=10, pady=20, sticky="nsew")
-
-    response_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size),
-                                      text_color='#639cdc', wrap="word")
-    response_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="nsew")
-    response_textbox.insert("0.0", prompts.INITIAL_RESPONSE)
-
-    freeze_button = ctk.CTkButton(root, text="Suggest Response", command=None)
-    freeze_button.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
-
-    update_interval_slider_label = ctk.CTkLabel(root, text="", font=("Arial", 12),
-                                                text_color="#FFFCF2")
-    update_interval_slider_label.grid(row=2, column=1, padx=10, pady=3, sticky="nsew")
-
-    update_interval_slider = ctk.CTkSlider(root, from_=1, to=10, width=300, height=20,
-                                           number_of_steps=9)
-    update_interval_slider.set(2)
-    update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
-
-    copy_button = ctk.CTkButton(root, text="Copy Audio Transcript", command=None)
-    copy_button.grid(row=2, column=0, padx=10, pady=3, sticky="nsew")
-
-    save_file_button = ctk.CTkButton(root, text="Save Audio Transcript to File", command=None)
-    save_file_button.grid(row=3, column=0, padx=10, pady=3, sticky="nsew")
-
-    transcript_button = ctk.CTkButton(root, text="Pause Transcript", command=None)
-    transcript_button.grid(row=4, column=0, padx=10, pady=3, sticky="nsew")
-
-    # Order of returned components is important. For adding new components add new components
-    # to the end
-    return [transcript_textbox, response_textbox, update_interval_slider,
-            update_interval_slider_label, freeze_button, copy_button,
-            save_file_button, transcript_button]
+import interactions
+import ui
+from requests.exceptions import ConnectionError
 
 
 def main():
-
     # Set up all arguments
     cmd_args = argparse.ArgumentParser(description='Command Line Arguments for Transcribe',
                                        formatter_class=RawTextHelpFormatter)
@@ -109,10 +28,15 @@ def main():
                           default='tiny',
                           help='Specify the model to use for transcription.'
                           '\nBy default tiny model is part of the install.'
-                          '\nbase model has to be downloaded from the link https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
-                          '\nsmall model has to be downloaded from the link https://drive.google.com/file/d/1vhtoZCwfYGi5C4jK1r-QVr5GobSBnKiH/view?usp=drive_link'
+                          '\nbase model has to be downloaded from the link \
+                            https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
+                          '\nsmall model has to be downloaded from the link \
+                            https://drive.google.com/file/d/1vhtoZCwfYGi5C4jK1r-QVr5GobSBnKiH/view?usp=drive_link'
                           '\nOpenAI has more models besides the ones specified above.'
-                          '\nThose models are prohibitive to use on local machines because of memory requirements.')
+                          '\nThose models are prohibitive to use on local machines because \
+                            of memory requirements.')
+    cmd_args.add_argument('-e', '--experimental', action='store_true', help='Experimental command\
+                          line argument. Behavior is undefined.')
     args = cmd_args.parse_args()
 
     try:
@@ -124,8 +48,16 @@ def main():
               ffmpeg and try again.")
         return
 
+    query_params = interactions.create_params()
+    try:
+        response = requests.get("http://127.0.0.1:5000/ping", params=query_params)
+        if response.status_code != 200:
+            print(f'Error received: {response}')
+    except ConnectionError:
+        print('Operating as a standalone client')
+
     root = ctk.CTk()
-    ui_components = create_ui_components(root)
+    ui_components = ui.create_ui_components(root)
     transcript_textbox = ui_components[0]
     response_textbox = ui_components[1]
     update_interval_slider = ui_components[2]
@@ -171,7 +103,7 @@ def main():
 
     # Add the clear transcript button to the UI
     clear_transcript_button = ctk.CTkButton(root, text="Clear Audio Transcript",
-                                            command=lambda: clear_context(transcriber, audio_queue))
+                                            command=lambda: ui.clear_context(transcriber, audio_queue))
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
     freeze_state = [True]  # Using list to be able to change its content inside inner functions
@@ -204,9 +136,9 @@ def main():
                                           {update_interval_slider.get()} \
                                           seconds")
 
-    update_transcript_UI(transcriber, transcript_textbox)
-    update_response_UI(responder, response_textbox, update_interval_slider_label,
-                       update_interval_slider, freeze_state)
+    ui.update_transcript_ui(transcriber, transcript_textbox)
+    ui.update_response_ui(responder, response_textbox, update_interval_slider_label,
+                          update_interval_slider, freeze_state)
 
     root.mainloop()
 
