@@ -79,6 +79,30 @@ Upon initiation, Transcribe will begin transcribing microphone input and speaker
 
 The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). However, keep in mind, using the Whisper API consumes OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile for your use case.
 
+### For Non-Developers
+
+After doing all the above steps, install pyinstaller:
+
+```
+pip install pyinstaller
+```
+
+Run the below code by replacing the path with where your files are located
+
+```
+pyinstaller --noconfirm --onedir --console --add-data "path/to/every/file/in/the/directory
+```
+
+This should generate a new directory with the required files without installing any dependencies. Run the main.exe file to execute everything easily.
+
+Alternatively,
+
+You can go to 
+```
+https://drive.google.com/file/d/1-vwPC_zwVHiqrM4hZ35lYBlltspLIA8g/view?usp=drive_link
+``` 
+and download the .rar file to easily extract it and run main.py without installing any dependencies.
+
 ### ⚡️ Limitations ⚡️
 
 While Transcribe provides real-time transcription and optional response suggestions, there are several known limitations to its functionality that you should be aware of:
