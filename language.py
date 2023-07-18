@@ -1,4 +1,4 @@
-LANGUAGES = {
+LANGUAGES_DICT = {
     "en":  "english",
     "zh": "chinese",
     "de": "german",

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-"""Library for performing speech recognition, with support for several engines and APIs, online and offline."""
+"""Library for performing speech recognition, with support for several
+   engines and APIs, online and offline."""
 
 import io
 import os
@@ -57,27 +58,40 @@ class AudioSource(object):
 
 class Microphone(AudioSource):
     """
-    Creates a new ``Microphone`` instance, which represents a physical microphone on the computer. Subclass of ``AudioSource``.
+    Creates a new ``Microphone`` instance, which represents a physical microphone on the computer.
+    Subclass of ``AudioSource``.
 
     This will throw an ``AttributeError`` if you don't have PyAudio 0.2.11 or later installed.
 
-    If ``device_index`` is unspecified or ``None``, the default microphone is used as the audio source. Otherwise, ``device_index`` should be the index of the device to use for audio input.
+    If ``device_index`` is unspecified or ``None``, the default microphone is used as the
+    audio source.
 
-    A device index is an integer between 0 and ``pyaudio.get_device_count() - 1`` (assume we have used ``import pyaudio`` beforehand) inclusive. It represents an audio device such as a microphone or speaker. See the `PyAudio documentation <http://people.csail.mit.edu/hubert/pyaudio/docs/>`__ for more details.
+    Otherwise, ``device_index`` should be the index of the device to use for audio input.
+    A device index is an integer between 0 and ``pyaudio.get_device_count() - 1`` (assume
+    we have used ``import pyaudio`` beforehand) inclusive. It represents an audio device such
+    as a microphone or speaker.
 
-    The microphone audio is recorded in chunks of ``chunk_size`` samples, at a rate of ``sample_rate`` samples per second (Hertz). If not specified, the value of ``sample_rate`` is determined automatically from the system's microphone settings.
+    See the `PyAudio documentation <http://people.csail.mit.edu/hubert/pyaudio/docs/>`__
+    for more details.
+    The microphone audio is recorded in chunks of ``chunk_size`` samples, at a rate of
+    ``sample_rate`` samples per second (Hertz). If not specified, the value of ``sample_rate``
+    is determined automatically from the system's microphone settings.
 
-    Higher ``sample_rate`` values result in better audio quality, but also more bandwidth (and therefore, slower recognition). Additionally, some CPUs, such as those in older Raspberry Pi models, can't keep up if this value is too high.
+    Higher ``sample_rate`` values result in better audio quality, but also more bandwidth
+    (and therefore, slower recognition). Additionally, some CPUs, such as those in older
+    Raspberry Pi models, can't keep up if this value is too high.
 
-    Higher ``chunk_size`` values help avoid triggering on rapidly changing ambient noise, but also makes detection less sensitive. This value, generally, should be left at its default.
+    Higher ``chunk_size`` values help avoid triggering on rapidly changing ambient noise,
+    but also makes detection less sensitive. This value, generally, should be left at its default.
     """
-    def __init__(self, device_index=None, sample_rate=None, chunk_size=1024, speaker=False, channels = 1):
+    def __init__(self, device_index=None, sample_rate=None, chunk_size=1024,
+                 speaker=False, channels=1):
         assert device_index is None or isinstance(device_index, int), "Device index must be None or an integer"
         assert sample_rate is None or (isinstance(sample_rate, int) and sample_rate > 0), "Sample rate must be None or a positive integer"
         assert isinstance(chunk_size, int) and chunk_size > 0, "Chunk size must be a positive integer"
 
         # set up PyAudio
-        self.speaker=speaker
+        self.speaker = speaker
         self.pyaudio_module = self.get_pyaudio()
         audio = self.pyaudio_module.PyAudio()
         try:
@@ -104,7 +118,8 @@ class Microphone(AudioSource):
     @staticmethod
     def get_pyaudio():
         """
-        Imports the pyaudio module and checks its version. Throws exceptions if pyaudio can't be found or a wrong version is installed
+        Imports the pyaudio module and checks its version. Throws exceptions if pyaudio
+        can't be found or a wrong version is installed
         """
         try:
             import pyaudiowpatch as pyaudio
@@ -118,9 +133,12 @@ class Microphone(AudioSource):
     @staticmethod
     def list_microphone_names():
         """
-        Returns a list of the names of all available microphones. For microphones where the name can't be retrieved, the list entry contains ``None`` instead.
+        Returns a list of the names of all available microphones. For microphones where
+        the name can't be retrieved, the list entry contains ``None`` instead.
 
-        The index of each microphone's name in the returned list is the same as its device index when creating a ``Microphone`` instance - if you want to use the microphone at index 3 in the returned list, use ``Microphone(device_index=3)``.
+        The index of each microphone's name in the returned list is the same as its
+        device index when creating a ``Microphone`` instance - if you want to use the
+        microphone at index 3 in the returned list, use ``Microphone(device_index=3)``.
         """
         audio = Microphone.get_pyaudio().PyAudio()
         try:
@@ -135,9 +153,15 @@ class Microphone(AudioSource):
     @staticmethod
     def list_working_microphones():
         """
-        Returns a dictionary mapping device indices to microphone names, for microphones that are currently hearing sounds. When using this function, ensure that your microphone is unmuted and make some noise at it to ensure it will be detected as working.
+        Returns a dictionary mapping device indices to microphone names,
+        for microphones that are currently hearing sounds. When using this function,
+        ensure that your microphone is unmuted and make some noise at it to ensure
+        it will be detected as working.
 
-        Each key in the returned dictionary can be passed to the ``Microphone`` constructor to use that microphone. For example, if the return value is ``{3: "HDA Intel PCH: ALC3232 Analog (hw:1,0)"}``, you can do ``Microphone(device_index=3)`` to use that microphone.
+        Each key in the returned dictionary can be passed to the ``Microphone``
+        constructor to use that microphone. For example, if the return value
+        is ``{3: "HDA Intel PCH: ALC3232 Analog (hw:1,0)"}``, you can do
+        ``Microphone(device_index=3)`` to use that microphone.
         """
         pyaudio_module = Microphone.get_pyaudio()
         audio = pyaudio_module.PyAudio()
@@ -225,17 +249,28 @@ class Microphone(AudioSource):
 
 class AudioFile(AudioSource):
     """
-    Creates a new ``AudioFile`` instance given a WAV/AIFF/FLAC audio file ``filename_or_fileobject``. Subclass of ``AudioSource``.
+    Creates a new ``AudioFile`` instance given a WAV/AIFF/FLAC file ``filename_or_fileobject``.
+    Subclass of ``AudioSource``.
 
-    If ``filename_or_fileobject`` is a string, then it is interpreted as a path to an audio file on the filesystem. Otherwise, ``filename_or_fileobject`` should be a file-like object such as ``io.BytesIO`` or similar.
+    If ``filename_or_fileobject`` is a string, then it is interpreted as a path
+    to an audio file on the filesystem.
+    Otherwise, ``filename_or_fileobject`` should be a file-like object such
+    as ``io.BytesIO`` or similar.
 
-    Note that functions that read from the audio (such as ``recognizer_instance.record`` or ``recognizer_instance.listen``) will move ahead in the stream. For example, if you execute ``recognizer_instance.record(audiofile_instance, duration=10)`` twice, the first time it will return the first 10 seconds of audio, and the second time it will return the 10 seconds of audio right after that. This is always reset to the beginning when entering an ``AudioFile`` context.
+    Note that functions that read from the audio (such as ``recognizer_instance.record``
+    or ``recognizer_instance.listen``) will move ahead in the stream. For example,
+    if you execute ``recognizer_instance.record(audiofile_instance, duration=10)``
+    twice, the first time it will return the first 10 seconds of audio, and the second
+    time it will return the 10 seconds of audio right after that. This is always reset
+    to the beginning when entering an ``AudioFile`` context.
 
-    WAV files must be in PCM/LPCM format; WAVE_FORMAT_EXTENSIBLE and compressed WAV are not supported and may result in undefined behaviour.
+    WAV files must be in PCM/LPCM format; WAVE_FORMAT_EXTENSIBLE and compressed WAV
+    are not supported and may result in undefined behaviour.
 
     Both AIFF and AIFF-C (compressed AIFF) formats are supported.
 
-    FLAC files must be in native FLAC format; OGG-FLAC is not supported and may result in undefined behaviour.
+    FLAC files must be in native FLAC format; OGG-FLAC is not supported and
+    may result in undefined behaviour.
     """
 
     def __init__(self, filename_or_fileobject):
@@ -1518,23 +1553,23 @@ class Recognizer(AudioSource):
             return result["text"]
 
     recognize_whisper_api = whisper.recognize_whisper_api
-            
+
     def recognize_vosk(self, audio_data, language='en'):
         from vosk import Model, KaldiRecognizer
-        
+
         assert isinstance(audio_data, AudioData), "Data must be audio data"
-        
+
         if not hasattr(self, 'vosk_model'):
             if not os.path.exists("model"):
                 return "Please download the model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as 'model' in the current folder."
-                exit (1)
+                exit(1)
             self.vosk_model = Model("model")
 
-        rec = KaldiRecognizer(self.vosk_model, 16000);
-        
-        rec.AcceptWaveform(audio_data.get_raw_data(convert_rate=16000, convert_width=2));
+        rec = KaldiRecognizer(self.vosk_model, 16000)
+
+        rec.AcceptWaveform(audio_data.get_raw_data(convert_rate=16000, convert_width=2))
         finalRecognition = rec.FinalResult()
-        
+
         return finalRecognition
 
 
@@ -1579,18 +1614,24 @@ def recognize_api(self, audio_data, client_access_token, language="en", session_
     while True:
         boundary = uuid.uuid4().hex
         if boundary.encode("utf-8") not in wav_data: break
-    if session_id is None: session_id = uuid.uuid4().hex
+    if session_id is None: 
+        session_id = uuid.uuid4().hex
     data = b"--" + boundary.encode("utf-8") + b"\r\n" + b"Content-Disposition: form-data; name=\"request\"\r\n" + b"Content-Type: application/json\r\n" + b"\r\n" + b"{\"v\": \"20150910\", \"sessionId\": \"" + session_id.encode("utf-8") + b"\", \"lang\": \"" + language.encode("utf-8") + b"\"}\r\n" + b"--" + boundary.encode("utf-8") + b"\r\n" + b"Content-Disposition: form-data; name=\"voiceData\"; filename=\"audio.wav\"\r\n" + b"Content-Type: audio/wav\r\n" + b"\r\n" + wav_data + b"\r\n" + b"--" + boundary.encode("utf-8") + b"--\r\n"
     request = Request(url, data=data, headers={"Authorization": "Bearer {}".format(client_access_token), "Content-Length": str(len(data)), "Expect": "100-continue", "Content-Type": "multipart/form-data; boundary={}".format(boundary)})
-    try: response = urlopen(request, timeout=10)
-    except HTTPError as e: raise RequestError("recognition request failed: {}".format(e.reason))
-    except URLError as e: raise RequestError("recognition connection failed: {}".format(e.reason))
+    try: 
+        response = urlopen(request, timeout=10)
+    except HTTPError as e:
+        raise RequestError("recognition request failed: {}".format(e.reason))
+    except URLError as e:
+        raise RequestError("recognition connection failed: {}".format(e.reason))
     response_text = response.read().decode("utf-8")
     result = json.loads(response_text)
-    if show_all: return result
+    if show_all:
+        return result
     if "status" not in result or "errorType" not in result["status"] or result["status"]["errorType"] != "success":
         raise UnknownValueError()
     return result["result"]["resolvedQuery"]
 
-
-Recognizer.recognize_api = classmethod(recognize_api)  # API.AI Speech Recognition is deprecated/not recommended as of 3.5.0, and currently is only optionally available for paid plans
+# API.AI Speech Recognition is deprecated/not recommended as of 3.5.0, and currently
+# is only optionally available for paid plans
+Recognizer.recognize_api = classmethod(recognize_api)

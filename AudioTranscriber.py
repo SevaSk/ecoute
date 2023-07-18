@@ -5,7 +5,6 @@ from datetime import timedelta
 import wave
 import tempfile
 import whisper
-import torch
 import custom_speech_recognition as sr
 import pyaudiowpatch as pyaudio
 from heapq import merge

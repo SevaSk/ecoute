@@ -1,21 +1,18 @@
 import threading
 import argparse
 from argparse import RawTextHelpFormatter
-import queue
 import time
 import requests
+from requests.exceptions import ConnectionError
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
 import customtkinter as ctk
-import AudioRecorder
-import torch
 import TranscriberModels
 import subprocess
-import pyperclip
 import interactions
 import ui
-from requests.exceptions import ConnectionError
-from language import LANGUAGES
+from language import LANGUAGES_DICT
+import globals
 
 
 def main():
@@ -63,40 +60,36 @@ def main():
     except ConnectionError:
         print('Operating as a standalone client')
 
+    global_vars = globals.TranscriptionGlobals()
+    model = TranscriberModels.get_model(args.api, model=args.model)
+
     root = ctk.CTk()
     ui_components = ui.create_ui_components(root)
     transcript_textbox = ui_components[0]
     response_textbox = ui_components[1]
     update_interval_slider = ui_components[2]
     update_interval_slider_label = ui_components[3]
-    freeze_button = ui_components[4]
-    copy_button = ui_components[5]
-    save_file_button = ui_components[6]
-    lang_combobox = ui_components[7]
-    transcript_button = ui_components[8]
+    global_vars.freeze_button = ui_components[4]
+    lang_combobox = ui_components[5]
 
-    audio_queue = queue.Queue()
-
-    user_audio_recorder = AudioRecorder.DefaultMicRecorder()
-    user_audio_recorder.record_into_queue(audio_queue)
+    global_vars.user_audio_recorder.record_into_queue(global_vars.audio_queue)
 
     time.sleep(2)
 
-    speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
-    speaker_audio_recorder.record_into_queue(audio_queue)
-    model = TranscriberModels.get_model(args.api, model=args.model)
+    global_vars.speaker_audio_recorder.record_into_queue(global_vars.audio_queue)
 
     # Transcribe and Respond threads, both work on the same instance of the AudioTranscriber class
-    transcriber = AudioTranscriber(user_audio_recorder.source,
-                                   speaker_audio_recorder.source, model)
-    transcribe_thread = threading.Thread(target=transcriber.transcribe_audio_queue,
-                                         args=(audio_queue,))
+    global_vars.transcriber = AudioTranscriber(global_vars.user_audio_recorder.source,
+                                               global_vars.speaker_audio_recorder.source, model)
+    transcribe_thread = threading.Thread(target=global_vars.transcriber.transcribe_audio_queue,
+                                         args=(global_vars.audio_queue,))
     transcribe_thread.daemon = True
     transcribe_thread.start()
 
-    responder = GPTResponder()
-    respond_thread = threading.Thread(target=responder.respond_to_transcriber,
-                                      args=(transcriber,))
+    global_vars.responder = GPTResponder()
+
+    respond_thread = threading.Thread(target=global_vars.responder.respond_to_transcriber,
+                                      args=(global_vars.transcriber,))
     respond_thread.daemon = True
     respond_thread.start()
 
@@ -110,45 +103,26 @@ def main():
     root.grid_columnconfigure(1, weight=1)
 
     # Add the clear transcript button to the UI
-    clear_transcript_button = ctk.CTkButton(root, text="Clear Audio Transcript",
-                                            command=lambda: ui.clear_context(transcriber, audio_queue))
-    clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
+    # clear_transcript_button = ctk.CTkButton(root, text="Clear Audio Transcript",
+    #                                        command=lambda: ui.clear_transcriber_context(global_vars.transcriber, global_vars.audio_queue))
+    # clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
-    freeze_state = [True]  # Using list to be able to change its content inside inner functions
+    global_vars.freeze_state = [True]
 
-    def freeze_unfreeze():
-        freeze_state[0] = not freeze_state[0]  # Invert the state
-        freeze_button.configure(text="Suggest Response" if freeze_state[0] else "Do Not Suggest Response")
-
-    freeze_button.configure(command=freeze_unfreeze)
-
-    def copy_to_clipboard():
-        pyperclip.copy(transcriber.get_transcript())
-
-    copy_button.configure(command=copy_to_clipboard)
-
-    def save_file():
-        filename = ctk.filedialog.asksaveasfilename()
-        with open(file=filename, mode="w", encoding='utf-8') as file_handle:
-            file_handle.write(transcriber.get_transcript())
-
-    save_file_button.configure(command=save_file)
-
-    def set_transcript_state():
-        transcriber.transcribe = not transcriber.transcribe
-        transcript_button.configure(text="Pause Transcript" if transcriber.transcribe else "Start Transcript")
-
-    transcript_button.configure(command=set_transcript_state)
-
+    ui_cb = ui.ui_callbacks()
+    global_vars.freeze_button.configure(command=ui_cb.freeze_unfreeze)
+    # copy_button.configure(command=ui_cb.copy_to_clipboard)
+    # save_file_button.configure(command=ui_cb.save_file)
+    # global_vars.transcript_button.configure(command=ui_cb.set_transcript_state)
     update_interval_slider_label.configure(text=f"Update interval: \
                                           {update_interval_slider.get()} \
                                           seconds")
 
     lang_combobox.configure(command=model.change_lang)
 
-    ui.update_transcript_ui(transcriber, transcript_textbox)
-    ui.update_response_ui(responder, response_textbox, update_interval_slider_label,
-                          update_interval_slider, freeze_state)
+    ui.update_transcript_ui(global_vars.transcriber, transcript_textbox)
+    ui.update_response_ui(global_vars.responder, response_textbox, update_interval_slider_label,
+                          update_interval_slider, global_vars.freeze_state)
 
     root.mainloop()
 

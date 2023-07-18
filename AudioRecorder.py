@@ -26,11 +26,12 @@ class BaseRecorder:
         print(f"[INFO] Completed ambient noise adjustment for {device_name}.")
 
     def record_into_queue(self, audio_queue):
-        def record_callback(_, audio:sr.AudioData) -> None:
+        def record_callback(_, audio: sr.AudioData) -> None:
             data = audio.get_raw_data()
             audio_queue.put((self.source_name, data, datetime.utcnow()))
 
-        self.recorder.listen_in_background(self.source, record_callback, phrase_time_limit=RECORD_TIMEOUT)
+        self.recorder.listen_in_background(self.source, record_callback,
+                                           phrase_time_limit=RECORD_TIMEOUT)
 
 
 class DefaultMicRecorder(BaseRecorder):
@@ -44,7 +45,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
         with pyaudio.PyAudio() as p:
             wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
             default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
-            
+
             if not default_speakers["isLoopbackDevice"]:
                 for loopback in p.get_loopback_device_info_generator():
                     if default_speakers["name"] in loopback["name"]:
@@ -52,7 +53,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
                         break
                 else:
                     print("[ERROR] No loopback device found.")
-        
+
         source = sr.Microphone(speaker=True,
                                device_index= default_speakers["index"],
                                sample_rate=int(default_speakers["defaultSampleRate"]),
