@@ -38,7 +38,9 @@ copy %ASSETS_DIR_SRC%\mel_filters.npz %ASSETS_DIR_DEST%
 copy %ASSETS_DIR_SRC%\gpt2.tiktoken %ASSETS_DIR_DEST%
 
 REM Code for zipping the final package
-"%WINRAR%" a -r -ep1 -df "%ZIP_FILE_DIR%" "%ZIP_LOCATION%" 
+ECHO Zipping file...
+ "%WINRAR%" a -r -ep1 -df -ibck "%ZIP_FILE_DIR%" "%ZIP_LOCATION%" 
+ECHO File Zipped
 
 REM Remove the temp, dist folders
 rmdir /S /Q %PYINSTALLER_DIST_PATH%
