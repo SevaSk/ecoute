@@ -61,6 +61,15 @@ class WhisperTranscriber:
 class APIWhisperTranscriber:
     def __init__(self):
         print('Using Open AI API for transcription.')
+        # lang parameter is not required for API invocation. This exists solely
+        # to support --api option from command line.
+        # A better solution is to create a base class for APIWhisperTranscriber,
+        # WhisperTranscriber and create change_lang method there and remove it from 
+        # this class
+        self.lang = 'en'
+
+    def change_lang(self, lang: str):
+        self.lang = lang
 
     def get_transcription(self, wav_file_path):
         try:
