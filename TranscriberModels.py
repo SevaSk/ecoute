@@ -64,7 +64,7 @@ class APIWhisperTranscriber:
         # lang parameter is not required for API invocation. This exists solely
         # to support --api option from command line.
         # A better solution is to create a base class for APIWhisperTranscriber,
-        # WhisperTranscriber and create change_lang method there and remove it from 
+        # WhisperTranscriber and create change_lang method there and remove it from
         # this class
         self.lang = 'en'
 

@@ -26,7 +26,7 @@ choco install ffmpeg
 ```
 Please run these commands in a PowerShell window with administrator privileges. For any issues during the installation, visit the official [Chocolatey](https://chocolatey.org/) and [FFmpeg](https://ffmpeg.org/) websites for troubleshooting.
 
-### 🔧 Installation
+### 🔧 Code Installation
 
 1. Clone transcribe repository:
 
@@ -79,10 +79,25 @@ Upon initiation, Transcribe will begin transcribing microphone input and speaker
 
 The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). However, keep in mind, using the Whisper API consumes OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile for your use case.
 
-### For Non-Developers (Windows)
-**Prerequisitess:**
+### Windows specific installs
 
-Install Winrar from https://www.win-rar.com/.
+(Optional) Install Winrar from https://www.win-rar.com/.
+
+Required for generating binaries from python code. If you do not intend to generate binaries and are only writing python code, you do not need to install winrar. 
+
+## Software Installation
+
+Download the zip file from 
+```
+https://drive.google.com/file/d/1EIz10Nvzc--A8W37YKfWgEChHYxrgvZz/view?usp=sharing
+``` 
+Unzip the files in a folder.
+
+Execute the file `transcribe\transcribe.exe\transcribe.exe`
+
+**Note: Currently, the software installation version only supports transcription.**
+
+Alternatively,
 
 In the file ```generate_binary.bat``` replace these paths at the top of the file to paths specific to your machine. 
 
