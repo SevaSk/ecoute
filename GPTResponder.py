@@ -1,9 +1,9 @@
 import openai
-from keys import OPENAI_API_KEY
+import GlobalVars
 from prompts import create_prompt, INITIAL_RESPONSE
 import time
 
-openai.api_key = OPENAI_API_KEY
+openai.api_key = GlobalVars.TranscriptionGlobals().api_key
 # Number of phrases to use for generating a response
 MAX_PHRASES = 10
 

@@ -5,7 +5,7 @@ import AudioTranscriber
 import prompts
 from language import LANGUAGES_DICT
 import customtkinter as ctk
-import globals
+import GlobalVars
 
 
 UI_FONT_SIZE = 20
@@ -13,10 +13,10 @@ UI_FONT_SIZE = 20
 
 class ui_callbacks:
 
-    global_vars: globals.TranscriptionGlobals
+    global_vars: GlobalVars.TranscriptionGlobals
 
     def __init__(self):
-        self.global_vars = globals.TranscriptionGlobals()
+        self.global_vars = GlobalVars.TranscriptionGlobals()
 
     def copy_to_clipboard(self):
         """Copy transcription text data to clipboard
@@ -109,7 +109,7 @@ def create_ui_components(root):
     root.geometry("1000x600")
 
     ui_cb = ui_callbacks()
-    global_vars = globals.TranscriptionGlobals()
+    global_vars = GlobalVars.TranscriptionGlobals()
 
     # Create the menu bar
     menubar = tk.Menu(root)

@@ -12,7 +12,8 @@ import subprocess
 import interactions
 import ui
 from language import LANGUAGES_DICT
-import globals
+import GlobalVars
+import configuration
 
 
 def main():
@@ -22,6 +23,9 @@ def main():
     cmd_args.add_argument('-a', '--api', action='store_true',
                           help='Use the online Open AI API for transcription.\
                           \nThis option requires an API KEY and will consume Open AI credits.')
+    cmd_args.add_argument('-k', '--api_key', action='store', default=None,
+                          help='API Key for accessing OpenAI APIs. This is an optional parameter.\
+                            Without the API Key only transcription works.')
     cmd_args.add_argument('-m', '--model', action='store', choices=['tiny', 'base', 'small'],
                           default='tiny',
                           help='Specify the model to use for transcription.'
@@ -60,7 +64,17 @@ def main():
     except ConnectionError:
         print('Operating as a standalone client')
 
-    global_vars = globals.TranscriptionGlobals()
+    global_vars = GlobalVars.TranscriptionGlobals()
+    config = configuration.Config().get_data()
+
+    # Command line arg for api_key takes preference over api_key specified in parameters.yaml file
+    if args.api_key is not None:
+        api_key = args.api_key
+    else:
+        api_key = config['OpenAI']['api_key']
+
+    global_vars.api_key = api_key
+
     model = TranscriberModels.get_model(args.api, model=args.model)
 
     root = ctk.CTk()
@@ -102,18 +116,10 @@ def main():
     root.grid_columnconfigure(0, weight=2)
     root.grid_columnconfigure(1, weight=1)
 
-    # Add the clear transcript button to the UI
-    # clear_transcript_button = ctk.CTkButton(root, text="Clear Audio Transcript",
-    #                                        command=lambda: ui.clear_transcriber_context(global_vars.transcriber, global_vars.audio_queue))
-    # clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
-
     global_vars.freeze_state = [True]
 
     ui_cb = ui.ui_callbacks()
     global_vars.freeze_button.configure(command=ui_cb.freeze_unfreeze)
-    # copy_button.configure(command=ui_cb.copy_to_clipboard)
-    # save_file_button.configure(command=ui_cb.save_file)
-    # global_vars.transcript_button.configure(command=ui_cb.set_transcript_state)
     update_interval_slider_label.configure(text=f"Update interval: \
                                           {update_interval_slider.get()} \
                                           seconds")

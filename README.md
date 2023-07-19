@@ -46,18 +46,12 @@ Please run these commands in a PowerShell window with administrator privileges. 
    pip install -r requirements.txt
    ```
    
-4. (Optional) Replace the Open API key in `keys.py` file in the transcribe directory:
+4. (Optional) Replace the Open API key in `parameters.yaml` file in the transcribe directory:
 
-   - Option 1: Use command prompt. Run the following command, ensuring to replace "API KEY" with the actual OpenAI API key:
-
-      ```
-      python -c "with open('keys.py', 'w', encoding='utf-8') as f: f.write('OPENAI_API_KEY=\"API KEY\"')"
-      ```
-
-   - Option 2: Replace the Open API key in keys.py file manually. Open in a text editor and enter the following content:
+   Replace the Open API key in `parameters.yaml` file manually. Open in a text editor and alter the line:
    
       ```
-      OPENAI_API_KEY="API KEY"
+        api_key: 'API_KEY'
       ```
       Replace "API KEY" with the actual OpenAI API key. Save the file.
 
@@ -79,25 +73,11 @@ Upon initiation, Transcribe will begin transcribing microphone input and speaker
 
 The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). However, keep in mind, using the Whisper API consumes OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile for your use case.
 
-### Windows specific installs
+### Crating Windows installs
 
-(Optional) Install Winrar from https://www.win-rar.com/.
+Install Winrar from https://www.win-rar.com/.
 
 Required for generating binaries from python code. If you do not intend to generate binaries and are only writing python code, you do not need to install winrar. 
-
-## Software Installation
-
-Download the zip file from 
-```
-https://drive.google.com/file/d/1EIz10Nvzc--A8W37YKfWgEChHYxrgvZz/view?usp=sharing
-``` 
-Unzip the files in a folder.
-
-Execute the file `transcribe\transcribe.exe\transcribe.exe`
-
-**Note: Currently, the software installation version only supports transcription.**
-
-Alternatively,
 
 In the file ```generate_binary.bat``` replace these paths at the top of the file to paths specific to your machine. 
 
@@ -111,6 +91,26 @@ SET WINRAR=C:\Program Files\WinRAR\winRAR.exe
 ```
 
 Run ```generate_binary.bat``` file by replacing paths at the top of the file to the ones in your local machine. It should generate a zip file with everything compiled. To run the program simply go to zip file > transcribe.exe.
+
+## Software Installation
+
+1. Download the zip file from
+```
+https://drive.google.com/file/d/1EIz10Nvzc--A8W37YKfWgEChHYxrgvZz/view?usp=sharing
+```
+2. Unzip the files in a folder.
+
+3. (Optional) Replace the Open API key in `parameters.yaml` file in the transcribe directory:
+
+   Replace the Open API key in `parameters.yaml` file manually. Open in a text editor and alter the line:
+
+      ```
+        api_key: 'API_KEY'
+      ```
+      Replace "API KEY" with the actual OpenAI API key. Save the file.
+
+4. Execute the file `transcribe\transcribe.exe\transcribe.exe`
+
 
 ### ⚡️ Limitations ⚡️
 
