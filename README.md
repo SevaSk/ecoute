@@ -96,7 +96,7 @@ Run ```generate_binary.bat``` file by replacing paths at the top of the file to 
 
 1. Download the zip file from
 ```
-https://drive.google.com/file/d/1EIz10Nvzc--A8W37YKfWgEChHYxrgvZz/view?usp=sharing
+https://drive.google.com/file/d/1UJR4rJt5umxxOiAHNGXPMhnnYr6Bj6fX/view?usp=sharing
 ```
 2. Unzip the files in a folder.
 

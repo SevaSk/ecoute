@@ -1,7 +1,7 @@
 REM Define variables for different hard coded paths (Change everything to your local PATHs)
 REM SET SOURCE_DIR=D:\Code\transcribe
 REM SET OUTPUT_DIR=D:\Code\transcribe\output
-REM SET LIBSITE_PACAGES_DIR=D:\Code\transcribe\venv\Lib\site-packages
+REM SET LIBSITE_PACAGES_DIR=D:\Code\transcribe\.venv\Lib\site-packages
 REM SET EXECUTABLE_NAME=transcribe.exe
 REM SET ZIP_FILE_DIR=D:\Code\transcribe\transcribe.rar
 REM SET ZIP_LOCATION=D:\Code\transcribe\output\dist\transcribe.exe
