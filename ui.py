@@ -81,9 +81,8 @@ def update_response_ui(responder, textbox, update_interval_slider_label,
         textbox.configure(state="disabled")
 
         update_interval = int(update_interval_slider.get())
-        responder.update_response_interval(update_interval)
-        update_interval_slider_label.configure(text=f"Update interval: \
-                                               {update_interval} seconds")
+        responder.set_response_interval(update_interval)
+        update_interval_slider_label.configure(text=f"Update Response interval: {update_interval} seconds")
 
     textbox.after(300, update_response_ui, responder, textbox,
                   update_interval_slider_label, update_interval_slider,

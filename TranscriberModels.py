@@ -2,6 +2,7 @@ import openai
 import whisper
 import os
 import torch
+import GlobalVars
 
 
 def get_model(use_api: bool, model: str = None):
@@ -61,6 +62,7 @@ class WhisperTranscriber:
 class APIWhisperTranscriber:
     def __init__(self):
         print('Using Open AI API for transcription.')
+        openai.api_key = GlobalVars.TranscriptionGlobals().api_key
         # lang parameter is not required for API invocation. This exists solely
         # to support --api option from command line.
         # A better solution is to create a base class for APIWhisperTranscriber,
