@@ -9,3 +9,5 @@ pyinstaller==5.13.0
 torch
 pyperclip
 PyYAML
+numpy
+soundfile

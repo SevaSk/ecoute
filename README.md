@@ -73,7 +73,15 @@ Upon initiation, Transcribe will begin transcribing microphone input and speaker
 
 The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). However, keep in mind, using the Whisper API consumes OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile for your use case.
 
-### Crating Windows installs
+### 🎬 Running Transcribe
+
+Unit Tests
+
+```
+python -m unittest discover --verbose .\tests
+```
+
+### Creating Windows installs
 
 Install Winrar from https://www.win-rar.com/.
 
