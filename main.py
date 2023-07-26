@@ -14,7 +14,7 @@ import ui
 from language import LANGUAGES_DICT
 import GlobalVars
 import configuration
-
+import conversation
 
 def main():
     # Set up all arguments
@@ -95,16 +95,20 @@ def main():
     time.sleep(2)
 
     global_vars.speaker_audio_recorder.record_into_queue(global_vars.audio_queue)
+    global_vars.freeze_state = [True]
+    convo = conversation.Conversation()
 
     # Transcribe and Respond threads, both work on the same instance of the AudioTranscriber class
     global_vars.transcriber = AudioTranscriber(global_vars.user_audio_recorder.source,
-                                               global_vars.speaker_audio_recorder.source, model)
+                                               global_vars.speaker_audio_recorder.source,
+                                               model,
+                                               convo=convo)
     transcribe_thread = threading.Thread(target=global_vars.transcriber.transcribe_audio_queue,
                                          args=(global_vars.audio_queue,))
     transcribe_thread.daemon = True
     transcribe_thread.start()
 
-    global_vars.responder = GPTResponder()
+    global_vars.responder = GPTResponder(convo=convo)
 
     respond_thread = threading.Thread(target=global_vars.responder.respond_to_transcriber,
                                       args=(global_vars.transcriber,))
@@ -119,8 +123,6 @@ def main():
     root.grid_rowconfigure(3, weight=1)
     root.grid_columnconfigure(0, weight=2)
     root.grid_columnconfigure(1, weight=1)
-
-    global_vars.freeze_state = [True]
 
     ui_cb = ui.ui_callbacks()
     global_vars.freeze_button.configure(command=ui_cb.freeze_unfreeze)

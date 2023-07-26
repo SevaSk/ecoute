@@ -1,19 +1,20 @@
 import os
+import queue
 import threading
 import io
 from datetime import timedelta
 import wave
 import tempfile
-import whisper
 import custom_speech_recognition as sr
 import pyaudiowpatch as pyaudio
 from heapq import merge
+import conversation
 
 PHRASE_TIMEOUT = 3.05
 
 
 class AudioTranscriber:
-    def __init__(self, mic_source, speaker_source, model):
+    def __init__(self, mic_source, speaker_source, model, convo: conversation.Conversation):
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
         self.audio_model = model
@@ -38,8 +39,9 @@ class AudioTranscriber:
                 "process_data_func": self.process_speaker_data
             }
         }
+        self.conversation = convo
 
-    def transcribe_audio_queue(self, audio_queue):
+    def transcribe_audio_queue(self, audio_queue: queue.Queue):
         """Transcribe data from audio sources. In this case we have 2 sources, microphone, speaker.
         Args:
           audio_queue: queue object with reference to audio files
@@ -109,9 +111,15 @@ class AudioTranscriber:
 
         if source_info["new_phrase"] or len(transcript) == 0:
             transcript.append((f"{who_spoke}: [{text}]\n\n", time_spoken))
+            self.conversation.update_conversation(persona=who_spoke,
+                                                  time_spoken=time_spoken,
+                                                  text=text)
         else:
             transcript.pop()
             transcript.append((f"{who_spoke}: [{text}]\n\n", time_spoken))
+            self.conversation.update_conversation(persona=who_spoke,
+                                                  time_spoken=time_spoken,
+                                                  text=text, pop=True)
 
     def get_transcript(self, length: int = 0):
         """Get the audio transcript

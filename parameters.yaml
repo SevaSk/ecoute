@@ -1,2 +1,11 @@
 OpenAI:
   api_key: 'API_KEY'
+
+# Possible model values
+# gpt-3.5-turbo, gpt-3.5-turbo-16k, gpt-3.5-turbo-0613, gpt-3.5-turbo-16k-0613
+# gpt-4, gpt-4-0613, gpt-4-32k, gpt-4-32k-0613
+# Legacy models
+# text-davinci-003, text-davinci-002, code-davinci-002
+# See this link for available models
+# https://platform.openai.com/docs/models/continuous-model-upgrades
+  ai_model: gpt-3.5-turbo-0301
