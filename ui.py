@@ -6,7 +6,7 @@ import prompts
 from language import LANGUAGES_DICT
 import customtkinter as ctk
 import GlobalVars
-
+import GPTResponder
 
 UI_FONT_SIZE = 20
 
@@ -66,8 +66,11 @@ def update_transcript_ui(transcriber: AudioTranscriber, textbox: ctk.CTkTextbox)
     textbox.after(300, update_transcript_ui, transcriber, textbox)
 
 
-def update_response_ui(responder, textbox, update_interval_slider_label,
-                       update_interval_slider, freeze_state):
+def update_response_ui(responder: GPTResponder,
+                       textbox: ctk.CTkTextbox,
+                       update_interval_slider_label: ctk.CTkLabel,
+                       update_interval_slider: ctk.CTkSlider,
+                       freeze_state):
     """Update the text of response textbox with the given text
         Args:
           textbox: textbox to be updated
@@ -81,7 +84,7 @@ def update_response_ui(responder, textbox, update_interval_slider_label,
         textbox.configure(state="disabled")
 
         update_interval = int(update_interval_slider.get())
-        responder.set_response_interval(update_interval)
+        responder.update_response_interval(update_interval)
         update_interval_slider_label.configure(text=f"Update Response interval: {update_interval} seconds")
 
     textbox.after(300, update_response_ui, responder, textbox,
@@ -89,7 +92,8 @@ def update_response_ui(responder, textbox, update_interval_slider_label,
                   freeze_state)
 
 
-def clear_transcriber_context(transcriber: AudioTranscriber, audio_queue: queue.Queue):
+def clear_transcriber_context(transcriber: AudioTranscriber, 
+                              audio_queue: queue.Queue):
     """Reset the transcriber
         Args:
           textbox: textbox to be updated

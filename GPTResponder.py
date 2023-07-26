@@ -3,33 +3,33 @@ import GlobalVars
 from prompts import create_prompt, INITIAL_RESPONSE
 import time
 
-openai.api_key = GlobalVars.TranscriptionGlobals().api_key
+
 # Number of phrases to use for generating a response
 MAX_PHRASES = 10
-
-
-def generate_response_from_transcript(transcript):
-    try:
-        prompt_content = create_prompt(transcript)
-        response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0301",
-                messages=[{"role": "system", "content": prompt_content}],
-                temperature=0.0
-        )
-    except Exception as exception:
-        print(exception)
-        return ''
-    full_response = response.choices[0].message.content
-    try:
-        return full_response.split('[')[1].split(']')[0]
-    except:
-        return ''
 
 
 class GPTResponder:
     def __init__(self):
         self.response = INITIAL_RESPONSE
         self.response_interval = 2
+        openai.api_key = GlobalVars.TranscriptionGlobals().api_key
+
+    def generate_response_from_transcript(self, transcript):
+        try:
+            prompt_content = create_prompt(transcript)
+            response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo-0301",
+                    messages=[{"role": "system", "content": prompt_content}],
+                    temperature=0.0
+            )
+        except Exception as exception:
+            print(exception)
+            return ''
+        full_response = response.choices[0].message.content
+        try:
+            return full_response.split('[')[1].split(']')[0]
+        except:
+            return ''
 
     def respond_to_transcriber(self, transcriber):
         while True:
@@ -38,7 +38,7 @@ class GPTResponder:
 
                 transcriber.transcript_changed_event.clear()
                 transcript_string = transcriber.get_transcript(length=MAX_PHRASES)
-                response = generate_response_from_transcript(transcript_string)
+                response = self.generate_response_from_transcript(transcript_string)
 
                 end_time = time.time()  # Measure end time
                 execution_time = end_time - start_time  # Calculate time to execute the function

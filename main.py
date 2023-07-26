@@ -65,6 +65,10 @@ def main():
         print('Operating as a standalone client')
 
     config = configuration.Config().get_data()
+
+    # Two calls to GlobalVars.TranscriptionGlobals is on purpose
+    global_vars = GlobalVars.TranscriptionGlobals()
+
     global_vars = GlobalVars.TranscriptionGlobals(key=config["OpenAI"]["api_key"])
 
     # Command line arg for api_key takes preference over api_key specified in parameters.yaml file

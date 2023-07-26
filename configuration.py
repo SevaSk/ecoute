@@ -2,6 +2,7 @@ import yaml
 import sys
 import Singleton
 
+
 class Config(Singleton.Singleton):
     """A Singleton object with all configuration data
     """
