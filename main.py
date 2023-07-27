@@ -62,7 +62,7 @@ def main():
         if response.status_code != 200:
             print(f'Error received: {response}')
     except ConnectionError:
-        print('Operating as a standalone client')
+        print('[INFO] Operating in Desktop mode')
 
     config = configuration.Config().get_data()
 

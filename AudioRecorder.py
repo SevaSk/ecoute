@@ -55,7 +55,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
                     print("[ERROR] No loopback device found.")
 
         source = sr.Microphone(speaker=True,
-                               device_index= default_speakers["index"],
+                               device_index=default_speakers["index"],
                                sample_rate=int(default_speakers["defaultSampleRate"]),
                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
                                channels=default_speakers["maxInputChannels"])

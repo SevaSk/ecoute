@@ -10,7 +10,7 @@ def get_model(use_api: bool, model: str = None):
         return APIWhisperTranscriber()
 
     model_cleaned = model if model else 'tiny'
-    print(f'Using model: {model_cleaned}')
+    print(f'[INFO] Using local model: {model_cleaned}')
     return WhisperTranscriber(model=model_cleaned)
 
 

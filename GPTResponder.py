@@ -1,6 +1,7 @@
 import openai
+import datetime
 import GlobalVars
-from prompts import create_prompt, INITIAL_RESPONSE
+import prompts
 import time
 import conversation
 import constants
@@ -12,7 +13,7 @@ MAX_PHRASES = 20
 
 class GPTResponder:
     def __init__(self, convo: conversation.Conversation):
-        self.response = INITIAL_RESPONSE
+        self.response = prompts.INITIAL_RESPONSE
         self.response_interval = 2
         self.gl_vars = GlobalVars.TranscriptionGlobals()
         openai.api_key = self.gl_vars.api_key
@@ -22,18 +23,25 @@ class GPTResponder:
 
     def generate_response_from_transcript_no_check(self, transcript):
         try:
-            prompt_content = create_prompt(transcript)
-            response = openai.ChatCompletion.create(
+            # prompt_content = create_prompt(transcript)
+            # prompt_api_message = [{"role": "system", "content": prompt_content}]
+            prompt_api_message = prompts.create_single_turn_prompt_message(transcript)
+            multiturn_prompt_content = self.conversation.get_merged_conversation(length=MAX_PHRASES)
+            multiturn_prompt_api_message = prompts.create_multiturn_prompt(multiturn_prompt_content)
+            # print(f'Usual prompt api message: {prompt_api_message}')
+            # print(f'Multiturn prompt: {multiturn_prompt_api_message}')
+            usual_response = openai.ChatCompletion.create(
                     model=self.model,
-                    messages=[{"role": "system", "content": prompt_content}],
+                    messages=prompt_api_message,
                     temperature=0.0
             )
+
         except Exception as exception:
             print(exception)
             return ''
-        full_response = response.choices[0].message.content
+        usual_full_response = usual_response.choices[0].message.content
         try:
-            return full_response.split('[')[1].split(']')[0]
+            return usual_full_response.split('[')[1].split(']')[0]
         except:
             return ''
 
@@ -44,7 +52,7 @@ class GPTResponder:
         if self.gl_vars.freeze_state[0]:
             return ''
 
-        return generate_response_from_transcript_no_check(self, transcript)
+        return self.generate_response_from_transcript_no_check(transcript)
 
     def respond_to_transcriber(self, transcriber):
         while True:
@@ -63,7 +71,7 @@ class GPTResponder:
                     self.response = response
                     self.conversation.update_conversation(persona=constants.PERSONA_ASSISTANT,
                                                           text=response,
-                                                          time_spoken=end_time)
+                                                          time_spoken=datetime.datetime.now())
 
                 remaining_time = self.response_interval - execution_time
                 if remaining_time > 0:
