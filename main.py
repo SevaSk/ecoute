@@ -11,10 +11,11 @@ import customtkinter as ctk
 import TranscriberModels
 import interactions
 import ui
-from language import LANGUAGES_DICT
 import GlobalVars
 import configuration
 import conversation
+import app_logging
+
 
 def main():
     # Set up all arguments
@@ -47,10 +48,23 @@ def main():
                           line argument. Behavior is undefined.')
     args = cmd_args.parse_args()
 
+    # Initiate config
+    config = configuration.Config().get_data()
+
+    # Initiate global variables
+    # Two calls to GlobalVars.TranscriptionGlobals is on purpose
+    global_vars = GlobalVars.TranscriptionGlobals()
+
+    global_vars = GlobalVars.TranscriptionGlobals(key=config["OpenAI"]["api_key"])
+
+    # Initiate logging
+    log_listener = app_logging.initiate_log(config=config)
+
     try:
         subprocess.run(["ffmpeg", "-version"],
-                       stdout = subprocess.DEVNULL,
-                       stderr = subprocess.DEVNULL)
+                       stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL,
+                       check=True)
     except FileNotFoundError:
         print("ERROR: The ffmpeg library is not installed. Please install \
               ffmpeg and try again.")
@@ -63,13 +77,6 @@ def main():
             print(f'Error received: {response}')
     except ConnectionError:
         print('[INFO] Operating in Desktop mode')
-
-    config = configuration.Config().get_data()
-
-    # Two calls to GlobalVars.TranscriptionGlobals is on purpose
-    global_vars = GlobalVars.TranscriptionGlobals()
-
-    global_vars = GlobalVars.TranscriptionGlobals(key=config["OpenAI"]["api_key"])
 
     # Command line arg for api_key takes preference over api_key specified in parameters.yaml file
     if args.api_key is not None:
@@ -104,6 +111,7 @@ def main():
                                                model,
                                                convo=convo)
     transcribe_thread = threading.Thread(target=global_vars.transcriber.transcribe_audio_queue,
+                                         name='Transcribe',
                                          args=(global_vars.audio_queue,))
     transcribe_thread.daemon = True
     transcribe_thread.start()
@@ -111,6 +119,7 @@ def main():
     global_vars.responder = GPTResponder(convo=convo)
 
     respond_thread = threading.Thread(target=global_vars.responder.respond_to_transcriber,
+                                      name='Respond',
                                       args=(global_vars.transcriber,))
     respond_thread.daemon = True
     respond_thread.start()
@@ -136,6 +145,7 @@ def main():
                           update_interval_slider, global_vars.freeze_state)
 
     root.mainloop()
+    log_listener.stop()
 
 
 if __name__ == "__main__":

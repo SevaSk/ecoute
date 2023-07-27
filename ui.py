@@ -7,7 +7,10 @@ from language import LANGUAGES_DICT
 import customtkinter as ctk
 import GlobalVars
 import GPTResponder
+import app_logging as al
 
+
+root_logger = al.get_logger()
 UI_FONT_SIZE = 20
 
 
@@ -21,23 +24,27 @@ class ui_callbacks:
     def copy_to_clipboard(self):
         """Copy transcription text data to clipboard
         """
+        root_logger.info(ui_callbacks.copy_to_clipboard.__name__)
         pyperclip.copy(self.global_vars.transcriber.get_transcript())
 
     def save_file(self):
         """Save transcription text data to file
         """
+        root_logger.info(ui_callbacks.save_file.__name__)
         filename = ctk.filedialog.asksaveasfilename()
         with open(file=filename, mode="w", encoding='utf-8') as file_handle:
             file_handle.write(self.global_vars.transcriber.get_transcript())
 
     def freeze_unfreeze(self):
         """Respond to start / stop of seeking responses from openAI API"""
+        root_logger.info(ui_callbacks.freeze_unfreeze.__name__)
         self.global_vars.freeze_state[0] = not self.global_vars.freeze_state[0]  # Invert the state
         self.global_vars.freeze_button.configure(
             text="Suggest Response" if self.global_vars.freeze_state[0] else "Do Not Suggest Response"
             )
 
     def set_transcript_state(self):
+        root_logger.info(ui_callbacks.set_transcript_state.__name__)
         self.global_vars.transcriber.transcribe = not self.global_vars.transcriber.transcribe
         self.global_vars.transcript_button.configure(
             text="Pause Transcript" if self.global_vars.transcriber.transcribe else "Start Transcript"
@@ -99,12 +106,14 @@ def clear_transcriber_context(transcriber: AudioTranscriber,
           textbox: textbox to be updated
           text: updated text
     """
+    root_logger.info(clear_transcriber_context.__name__)
     transcriber.clear_transcript_data()
     with audio_queue.mutex:
         audio_queue.queue.clear()
 
 
 def create_ui_components(root):
+    root_logger.info(create_ui_components.__name__)
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("dark-blue")
     root.title("Transcribe")

@@ -3,7 +3,10 @@ from AudioTranscriber import AudioTranscriber
 import AudioRecorder
 import customtkinter as ctk
 import Singleton
+import app_logging as al
 
+
+root_logger = al.get_logger()
 
 class TranscriptionGlobals(Singleton.Singleton):
     """Global constants for audio processing. It is implemented as a Singleton class.
@@ -22,6 +25,7 @@ class TranscriptionGlobals(Singleton.Singleton):
     api_key: str = None
 
     def __init__(self, key: str = 'API_KEY'):
+        root_logger.info(TranscriptionGlobals.__name__)
         if self.audio_queue is None:
             self.audio_queue = queue.Queue()
         if self.user_audio_recorder is None:

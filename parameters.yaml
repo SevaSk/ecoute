@@ -9,3 +9,6 @@ OpenAI:
 # See this link for available models
 # https://platform.openai.com/docs/models/continuous-model-upgrades
   ai_model: gpt-3.5-turbo-0301
+
+General:
+  log_file: 'Transcribe.log'

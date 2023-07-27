@@ -6,13 +6,17 @@ import time
 import conversation
 import constants
 import configuration
+import app_logging as al
+
 
 # Number of phrases to use for generating a response
 MAX_PHRASES = 20
+root_logger = al.get_logger()
 
 
 class GPTResponder:
     def __init__(self, convo: conversation.Conversation):
+        root_logger.info(GPTResponder.__name__)
         self.response = prompts.INITIAL_RESPONSE
         self.response_interval = 2
         self.gl_vars = GlobalVars.TranscriptionGlobals()
@@ -80,4 +84,5 @@ class GPTResponder:
                 time.sleep(0.3)
 
     def update_response_interval(self, interval):
+        root_logger.info(GPTResponder.update_response_interval.__name__)
         self.response_interval = interval

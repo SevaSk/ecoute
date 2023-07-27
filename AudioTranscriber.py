@@ -10,6 +10,7 @@ import pyaudiowpatch as pyaudio
 from heapq import merge
 import conversation
 
+
 PHRASE_TIMEOUT = 3.05
 
 

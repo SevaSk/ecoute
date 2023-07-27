@@ -1,9 +1,14 @@
 import subprocess
 import socket
+import app_logging as al
+
+
+root_logger = al.get_logger()
 
 
 def create_params() -> dict:
     try:
+        root_logger.info(create_params.__name__)
         git_version = subprocess.check_output(
             ['git', 'rev-parse', '--short', 'HEAD']).decode("utf-8").strip()
     except subprocess.CalledProcessError as process_exception:

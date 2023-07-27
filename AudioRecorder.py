@@ -1,14 +1,18 @@
 import custom_speech_recognition as sr
 import pyaudiowpatch as pyaudio
 from datetime import datetime
+import app_logging as al
 
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
 DYNAMIC_ENERGY_THRESHOLD = False
 
+root_logger = al.get_logger()
+
 
 class BaseRecorder:
     def __init__(self, source, source_name):
+        root_logger.info(BaseRecorder.__name__)
         self.recorder = sr.Recognizer()
         self.recorder.energy_threshold = ENERGY_THRESHOLD
         self.recorder.dynamic_energy_threshold = DYNAMIC_ENERGY_THRESHOLD
@@ -20,6 +24,7 @@ class BaseRecorder:
         self.source_name = source_name
 
     def adjust_for_noise(self, device_name, msg):
+        root_logger.info(BaseRecorder.adjust_for_noise.__name__)
         print(f"[INFO] Adjusting for ambient noise from {device_name}. " + msg)
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
@@ -36,12 +41,14 @@ class BaseRecorder:
 
 class DefaultMicRecorder(BaseRecorder):
     def __init__(self):
+        root_logger.info(DefaultMicRecorder.__name__)
         super().__init__(source=sr.Microphone(sample_rate=16000), source_name="You")
         self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
 
 
 class DefaultSpeakerRecorder(BaseRecorder):
     def __init__(self):
+        root_logger.info(DefaultSpeakerRecorder.__name__)
         with pyaudio.PyAudio() as p:
             wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
             default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
