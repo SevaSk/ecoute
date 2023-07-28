@@ -27,23 +27,31 @@ def main():
     cmd_args.add_argument('-k', '--api_key', action='store', default=None,
                           help='API Key for accessing OpenAI APIs. This is an optional parameter.\
                             Without the API Key only transcription works.')
-    cmd_args.add_argument('-m', '--model', action='store', choices=['tiny', 'base', 'small'],
+    cmd_args.add_argument('-m', '--model', action='store', choices=['tiny', 'tiny.en.pt', 'base', 'base.en.pt', 'small', 'small.en.pt', 'medium', 'medium.en.pt' 'large-v1', 'large-v2', 'large'],
                           default='tiny',
                           help='Specify the model to use for transcription.'
                           '\nBy default tiny english model is part of the install.'
                           '\ntiny multi-lingual model has to be downloaded from the link \
                             https://drive.google.com/file/d/1M4AFutTmQROaE9xk2jPc5Y4oFRibHhEh/view?usp=drive_link'
                           '\nbase english model has to be downloaded from the link \
-                            https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link'
+                            https://openaipublic.azureedge.net/main/whisper/models/25a8566e1d0c1e2231d1c762132cd20e0f96a85d16145c3a00adf5d1ac670ead/base.en.pt'
                           '\nbase multi-lingual model has to be downloaded from the link \
-                            https://drive.google.com/file/d/1UcqU_D0cPFqq_nckSfstMBfogFsvR-KR/view?usp=drive_link'
+                            https://openaipublic.azureedge.net/main/whisper/models/ed3a0b6b1c0edf879ad9b11b1af5a0e6ab5db9205f891f668f8b0e6c6326e34e/base.pt'
                           '\nsmall english model has to be downloaded from the link \
-                            https://drive.google.com/file/d/1vhtoZCwfYGi5C4jK1r-QVr5GobSBnKiH/view?usp=drive_link'
+                            https://openaipublic.azureedge.net/main/whisper/models/f953ad0fd29cacd07d5a9eda5624af0f6bcf2258be67c92b79389873d91e0872/small.en.pt'
                           '\nsmall multi-lingual model has to be downloaded from the link \
-                            https://drive.google.com/file/d/1bl8er_st8WPZKPWVeYMNlaUi9IzR3jEZ/view?usp=drive_link'
-                          '\nOpenAI has more models besides the ones specified above.'
-                          '\nThose models are prohibitive to use on local machines because \
-                            of memory requirements.')
+                            https://openaipublic.azureedge.net/main/whisper/models/9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794/small.pt'
+                          '\n The models below require higher computing power:'
+                          '\nmedium english model has to be downloaded from the link \
+                            https://openaipublic.azureedge.net/main/whisper/models/d7440d1dc186f76616474e0ff0b3b6b879abc9d1a4926b7adfa41db2d497ab4f/medium.en.pt'
+                          '\nmedium multi-lingual model has to be downloaded from the link \
+                            https://openaipublic.azureedge.net/main/whisper/models/345ae4da62f9b3d59415adc60127b97c714f32e89e936602e85993674d08dcb1/medium.pt'
+                          '\nlarge model has to be downloaded from the link \
+                            https://openaipublic.azureedge.net/main/whisper/models/81f7c96c852ee8fc832187b0132e569d6c3065a3252ed18e56effd0b6a73e524/large-v2.pt'
+                          '\nlarge-v1 model has to be downloaded from the link \
+                            https://openaipublic.azureedge.net/main/whisper/models/e4b87e7e0bf463eb8e6956e646f1e277e901512310def2c24bf0e11bd3c28e9a/large-v1.pt'
+                          '\nlarge-v2 model has to be downloaded from the link \
+                            https://openaipublic.azureedge.net/main/whisper/models/81f7c96c852ee8fc832187b0132e569d6c3065a3252ed18e56effd0b6a73e524/large-v2.pt')
     cmd_args.add_argument('-e', '--experimental', action='store_true', help='Experimental command\
                           line argument. Behavior is undefined.')
     args = cmd_args.parse_args()
