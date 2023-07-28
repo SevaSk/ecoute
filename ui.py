@@ -8,6 +8,7 @@ import customtkinter as ctk
 import GlobalVars
 import GPTResponder
 import app_logging as al
+import constants
 
 
 root_logger = al.get_logger()
@@ -40,15 +41,28 @@ class ui_callbacks:
         root_logger.info(ui_callbacks.freeze_unfreeze.__name__)
         self.global_vars.freeze_state[0] = not self.global_vars.freeze_state[0]  # Invert the state
         self.global_vars.freeze_button.configure(
-            text="Suggest Response" if self.global_vars.freeze_state[0] else "Do Not Suggest Response"
+            text="Suggest Responses Continuously" if self.global_vars.freeze_state[0] else "Do Not Suggest Responses Continuously"
             )
 
+    def update_response_ui_now(self):
+        """Get response from LLM right away"""
+        transcript_string = self.global_vars.transcriber.get_transcript(
+            length=constants.MAX_TRANSCRIPTION_PHRASES_FOR_LLM)
+
+        response_string = self.global_vars.responder.generate_response_from_transcript_no_check(transcript_string)
+        self.global_vars.response_textbox.configure(state="normal")
+        write_in_textbox(self.global_vars.response_textbox, response_string)
+        self.global_vars.response_textbox.configure(state="disabled")
+
     def set_transcript_state(self):
+        """Enables, disables transcription.
+           Text of menu item File -> Pause Transcription toggles accordingly"""
         root_logger.info(ui_callbacks.set_transcript_state.__name__)
         self.global_vars.transcriber.transcribe = not self.global_vars.transcriber.transcribe
-        self.global_vars.transcript_button.configure(
-            text="Pause Transcript" if self.global_vars.transcriber.transcribe else "Start Transcript"
-            )
+        if self.global_vars.transcriber.transcribe:
+            self.global_vars.filemenu.entryconfigure(1, label="Pause Transcription")
+        else:
+            self.global_vars.filemenu.entryconfigure(1, label="Start Transcription")
 
 
 def write_in_textbox(textbox: ctk.CTkTextbox, text: str):
@@ -99,7 +113,7 @@ def update_response_ui(responder: GPTResponder,
                   freeze_state)
 
 
-def clear_transcriber_context(transcriber: AudioTranscriber, 
+def clear_transcriber_context(transcriber: AudioTranscriber,
                               audio_queue: queue.Queue):
     """Reset the transcriber
         Args:
@@ -151,6 +165,8 @@ def create_ui_components(root):
     # Add a "Copy To Clipboard" menu item to the file menu
     editmenu.add_command(label="Copy Transcript to Clipboard", command=ui_cb.copy_to_clipboard)
 
+    # See example of add_radiobutton() at https://www.plus2net.com/python/tkinter-menu.php
+    # Radiobutton would be a good way to display different languages
     # lang_menu = tk.Menu(menubar, tearoff=False)
     # for lang in LANGUAGES_DICT.values():
     #    model.change_lang
@@ -172,8 +188,11 @@ def create_ui_components(root):
     response_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="nsew")
     response_textbox.insert("0.0", prompts.INITIAL_RESPONSE)
 
-    freeze_button = ctk.CTkButton(root, text="Suggest Response", command=None)
+    freeze_button = ctk.CTkButton(root, text="Suggest Responses Continuously", command=None)
     freeze_button.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
+
+    response_now_button = ctk.CTkButton(root, text="Suggest Responses Now", command=None)
+    response_now_button.grid(row=2, column=1, padx=10, pady=3, sticky="nsew")
 
     update_interval_slider_label = ctk.CTkLabel(root, text="", font=("Arial", 12),
                                                 text_color="#FFFCF2")
@@ -185,9 +204,10 @@ def create_ui_components(root):
     update_interval_slider.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
 
     lang_combobox = ctk.CTkOptionMenu(root, values=list(LANGUAGES_DICT.values()))
-    lang_combobox.grid(row=2, column=1, padx=200, pady=10, sticky="nsew")
+    lang_combobox.grid(row=3, column=0, padx=200, pady=10, sticky="nsew")
 
     # Order of returned components is important.
     # Add new components to the end
     return [transcript_textbox, response_textbox, update_interval_slider,
-            update_interval_slider_label, freeze_button, lang_combobox]
+            update_interval_slider_label, freeze_button, lang_combobox,
+            filemenu, response_now_button]

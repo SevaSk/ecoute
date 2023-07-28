@@ -2,12 +2,12 @@ import threading
 import argparse
 from argparse import RawTextHelpFormatter
 import time
-import requests
 import subprocess
+import requests
 from requests.exceptions import ConnectionError
+import customtkinter as ctk
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
-import customtkinter as ctk
 import TranscriberModels
 import interactions
 import ui
@@ -96,7 +96,11 @@ def main():
     update_interval_slider_label = ui_components[3]
     global_vars.freeze_button = ui_components[4]
     lang_combobox = ui_components[5]
+    filemenu = ui_components[6]
+    response_now_button = ui_components[7]
 
+    global_vars.filemenu = filemenu
+    global_vars.response_textbox = response_textbox
     global_vars.user_audio_recorder.record_into_queue(global_vars.audio_queue)
 
     time.sleep(2)
@@ -135,6 +139,7 @@ def main():
 
     ui_cb = ui.ui_callbacks()
     global_vars.freeze_button.configure(command=ui_cb.freeze_unfreeze)
+    response_now_button.configure(command=ui_cb.update_response_ui_now)
     label_text = f'Update Response interval: {update_interval_slider.get()} seconds'
     update_interval_slider_label.configure(text=label_text)
 

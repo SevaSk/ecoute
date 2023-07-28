@@ -1,12 +1,14 @@
 import queue
+import tkinter as tk
+import customtkinter as ctk
 from AudioTranscriber import AudioTranscriber
 import AudioRecorder
-import customtkinter as ctk
 import Singleton
 import app_logging as al
 
 
 root_logger = al.get_logger()
+
 
 class TranscriptionGlobals(Singleton.Singleton):
     """Global constants for audio processing. It is implemented as a Singleton class.
@@ -23,6 +25,8 @@ class TranscriptionGlobals(Singleton.Singleton):
     freeze_state: list = None
     freeze_button: ctk.CTkButton = None
     api_key: str = None
+    filemenu: tk.Menu = None
+    response_textbox: ctk.CTkTextbox = None
 
     def __init__(self, key: str = 'API_KEY'):
         root_logger.info(TranscriptionGlobals.__name__)
