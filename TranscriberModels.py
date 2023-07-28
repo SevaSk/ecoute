@@ -15,8 +15,8 @@ def get_model(use_api: bool, model: str = None):
 
 
 class WhisperTranscriber:
-    def __init__(self, model: str = 'tiny'):
-        model_filename = model + '.en.pt'
+    def __init__(self, model: str = 'tiny.en.pt'):
+        model_filename = model
         self.lang = 'en'
         self.model = model
 
@@ -24,17 +24,28 @@ class WhisperTranscriber:
             print(f'Could not find the model file: {model_filename}')
             print(f'Download the model file and add it to the directory: \
                   {os.getcwd()}')
-            print('tiny multi-lingual model is available at: \
-                  https://drive.google.com/file/d/1M4AFutTmQROaE9xk2jPc5Y4oFRibHhEh/view?usp=drive_link')
-            print('small english model is available at: \
-                  https://drive.google.com/file/d/1vhtoZCwfYGi5C4jK1r-QVr5GobSBnKiH/view?usp=drive_link')
-            print('small multi-lingual model is available at: \
-                  https://drive.google.com/file/d/1bl8er_st8WPZKPWVeYMNlaUi9IzR3jEZ/view?usp=drive_link')
-            print('base english model is available at: \
-                  https://drive.google.com/file/d/1E44DVjpfZX8tSrSagaDJXU91caZOkwa6/view?usp=drive_link')
-            print('base multi-lingual model is available at: \
-                  https://drive.google.com/file/d/1UcqU_D0cPFqq_nckSfstMBfogFsvR-KR/view?usp=drive_link')
+            print('tiny multi-lingual model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/65147644a518d12f04e32d6f3b26facc3f8dd46e5390956a9424a650c0ce22b9/tiny.pt')
+            print('base english model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/25a8566e1d0c1e2231d1c762132cd20e0f96a85d16145c3a00adf5d1ac670ead/base.en.pt')
+            print('base multi-lingual model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/ed3a0b6b1c0edf879ad9b11b1af5a0e6ab5db9205f891f668f8b0e6c6326e34e/base.pt')
+            print('small english model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/f953ad0fd29cacd07d5a9eda5624af0f6bcf2258be67c92b79389873d91e0872/small.en.pt')
+            print('small multi-lingual model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794/small.pt')
+            print('medium english model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/d7440d1dc186f76616474e0ff0b3b6b879abc9d1a4926b7adfa41db2d497ab4f/medium.en.pt')
+            print('medium multi-lingual model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/345ae4da62f9b3d59415adc60127b97c714f32e89e936602e85993674d08dcb1/medium.pt')
+            print('large model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/81f7c96c852ee8fc832187b0132e569d6c3065a3252ed18e56effd0b6a73e524/large-v2.pt')
+            print('large-v1 model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/e4b87e7e0bf463eb8e6956e646f1e277e901512310def2c24bf0e11bd3c28e9a/large-v1.pt')
+            print('large-v2 model has to be downloaded from the link \
+                    https://openaipublic.azureedge.net/main/whisper/models/81f7c96c852ee8fc832187b0132e569d6c3065a3252ed18e56effd0b6a73e524/large-v2.pt')
             exit()
+
         self.model_filename = os.path.join(os.getcwd(), model_filename)
         self.audio_model = whisper.load_model(self.model_filename)
         print(f'[INFO] Whisper using GPU: {str(torch.cuda.is_available())}')
