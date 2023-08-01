@@ -89,6 +89,7 @@ class Microphone(AudioSource):
         assert device_index is None or isinstance(device_index, int), "Device index must be None or an integer"
         assert sample_rate is None or (isinstance(sample_rate, int) and sample_rate > 0), "Sample rate must be None or a positive integer"
         assert isinstance(chunk_size, int) and chunk_size > 0, "Chunk size must be a positive integer"
+        self.device_info = None
 
         # set up PyAudio
         self.speaker = speaker
@@ -131,7 +132,7 @@ class Microphone(AudioSource):
         return pyaudio
 
     @staticmethod
-    def list_microphone_names():
+    def list_microphone_names() -> list:
         """
         Returns a list of the names of all available microphones. For microphones where
         the name can't be retrieved, the list entry contains ``None`` instead.
@@ -151,7 +152,7 @@ class Microphone(AudioSource):
         return result
 
     @staticmethod
-    def list_working_microphones():
+    def list_working_microphones() -> dict:
         """
         Returns a dictionary mapping device indices to microphone names,
         for microphones that are currently hearing sounds. When using this function,
@@ -162,6 +163,8 @@ class Microphone(AudioSource):
         constructor to use that microphone. For example, if the return value
         is ``{3: "HDA Intel PCH: ALC3232 Analog (hw:1,0)"}``, you can do
         ``Microphone(device_index=3)`` to use that microphone.
+
+        At the moment when this method is called, it does not return for several minutes.
         """
         pyaudio_module = Microphone.get_pyaudio()
         audio = pyaudio_module.PyAudio()
