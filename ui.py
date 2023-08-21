@@ -191,7 +191,7 @@ def create_ui_components(root):
     freeze_button = ctk.CTkButton(root, text="Suggest Responses Continuously", command=None)
     freeze_button.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
 
-    response_now_button = ctk.CTkButton(root, text="Suggest Responses Now", command=None)
+    response_now_button = ctk.CTkButton(root, text="Suggest Response Now", command=None)
     response_now_button.grid(row=2, column=1, padx=10, pady=3, sticky="nsew")
 
     update_interval_slider_label = ctk.CTkLabel(root, text="", font=("Arial", 12),

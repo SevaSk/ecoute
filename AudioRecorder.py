@@ -1,8 +1,8 @@
+from datetime import datetime
+from abc import abstractmethod
 import custom_speech_recognition as sr
 import pyaudiowpatch as pyaudio
-from datetime import datetime
 import app_logging as al
-from abc import abstractmethod
 
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
@@ -83,6 +83,8 @@ def print_detailed_audio_info(print_func=print):
 
 
 class BaseRecorder:
+    """Base class for Speaker, Microphone classes
+    """
     def __init__(self, source, source_name):
         root_logger.info(BaseRecorder.__name__)
         self.recorder = sr.Recognizer()
@@ -116,13 +118,16 @@ class BaseRecorder:
                                            phrase_time_limit=RECORD_TIMEOUT)
 
 
-class DefaultMicRecorder(BaseRecorder):
+class MicRecorder(BaseRecorder):
+    """Encapsultes the Microphone device audio input
+    """
     def __init__(self):
-        root_logger.info(DefaultMicRecorder.__name__)
-        with pyaudio.PyAudio() as p:
+        root_logger.info(MicRecorder.__name__)
+        with pyaudio.PyAudio() as py_audio:
             # WASAPI is windows specific
-            wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-            default_mic = p.get_device_info_by_index(wasapi_info["defaultInputDevice"])
+            wasapi_info = py_audio.get_host_api_info_by_type(pyaudio.paWASAPI)
+            self.device_index = wasapi_info["defaultInputDevice"]
+            default_mic = py_audio.get_device_info_by_index(self.device_index)
 
         self.device_info = default_mic
 
@@ -130,20 +135,46 @@ class DefaultMicRecorder(BaseRecorder):
                                sample_rate=int(default_mic["defaultSampleRate"]),
                                channels=default_mic["maxInputChannels"]
                                )
+        self.source = source
         super().__init__(source=source, source_name="You")
         print(f'[INFO] Listening to sound from Microphone: {self.get_name()} ')
+        # This line is commented because in case of non default microphone it can occasionally take
+        # several minutes to execute, thus delaying the start of the application.
         # self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
 
     def get_name(self):
-        return self.device_info['name']
+        return f'#{self.device_index} - {self.device_info["name"]}'
+
+    def set_device(self, index: int):
+        """Set active device based on index.
+        """
+        root_logger.info(MicRecorder.set_device.__name__)
+        with pyaudio.PyAudio() as py_audio:
+            self.device_index = index
+            mic = py_audio.get_device_info_by_index(self.device_index)
+
+        self.device_info = mic
+
+        source = sr.Microphone(device_index=mic["index"],
+                               sample_rate=int(mic["defaultSampleRate"]),
+                               channels=mic["maxInputChannels"]
+                               )
+        self.source = source
+        print(f'[INFO] Listening to sound from Microphone: {self.get_name()} ')
+        # This line is commented because in case of non default microphone it can occasionally take
+        # several minutes to execute, thus delaying the start of the application.
+        # self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
 
 
-class DefaultSpeakerRecorder(BaseRecorder):
+class SpeakerRecorder(BaseRecorder):
+    """Encapsultes the Speaer device audio input
+    """
     def __init__(self):
-        root_logger.info(DefaultSpeakerRecorder.__name__)
+        root_logger.info(SpeakerRecorder.__name__)
         with pyaudio.PyAudio() as p:
             wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-            default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
+            self.device_index = wasapi_info["defaultOutputDevice"]
+            default_speakers = p.get_device_info_by_index(self.device_index)
 
             if not default_speakers["isLoopbackDevice"]:
                 for loopback in p.get_loopback_device_info_generator():
@@ -163,10 +194,38 @@ class DefaultSpeakerRecorder(BaseRecorder):
         super().__init__(source=source, source_name="Speaker")
         print(f'[INFO] Listening to sound from Speaker: {self.get_name()} ')
         self.adjust_for_noise("Default Speaker",
-                              "Please make or play some noise from the Default Speaker...")
+                              "Please play sound from Default Speaker...")
 
     def get_name(self):
-        return self.device_info['name']
+        return f'#{self.device_index} - {self.device_info["name"]}'
+
+    def set_device(self, index: int):
+        """Set active device based on index.
+        """
+        root_logger.info(SpeakerRecorder.set_device.__name__)
+        with pyaudio.PyAudio() as p:
+            self.device_index = index
+            speakers = p.get_device_info_by_index(self.device_index)
+
+            if not speakers["isLoopbackDevice"]:
+                for loopback in p.get_loopback_device_info_generator():
+                    if speakers["name"] in loopback["name"]:
+                        speakers = loopback
+                        break
+                else:
+                    print("[ERROR] No loopback device found.")
+
+        self.device_info = speakers
+
+        source = sr.Microphone(speaker=True,
+                               device_index=speakers["index"],
+                               sample_rate=int(speakers["defaultSampleRate"]),
+                               chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
+                               channels=speakers["maxInputChannels"])
+        self.source = source
+        print(f'[INFO] Listening to sound from Speaker: {self.get_name()} ')
+        self.adjust_for_noise("Speaker",
+                              f"Please play sound from selected Speakers {self.get_name()}...")
 
 
 if __name__ == "__main__":

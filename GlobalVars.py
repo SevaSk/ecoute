@@ -15,8 +15,8 @@ class TranscriptionGlobals(Singleton.Singleton):
     """
 
     audio_queue: queue.Queue = None
-    user_audio_recorder: AudioRecorder.DefaultMicRecorder = None
-    speaker_audio_recorder: AudioRecorder.DefaultSpeakerRecorder = None
+    user_audio_recorder: AudioRecorder.MicRecorder = None
+    speaker_audio_recorder: AudioRecorder.SpeakerRecorder = None
     # Global for transcription from speaker, microphone
     transcriber: AudioTranscriber = None
     # Global for responses from openAI API
@@ -33,8 +33,8 @@ class TranscriptionGlobals(Singleton.Singleton):
         if self.audio_queue is None:
             self.audio_queue = queue.Queue()
         if self.user_audio_recorder is None:
-            self.user_audio_recorder = AudioRecorder.DefaultMicRecorder()
+            self.user_audio_recorder = AudioRecorder.MicRecorder()
         if self.speaker_audio_recorder is None:
-            self.speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
+            self.speaker_audio_recorder = AudioRecorder.SpeakerRecorder()
         if self.api_key is None:
             self.api_key = key

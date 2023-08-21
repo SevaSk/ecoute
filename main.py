@@ -19,6 +19,8 @@ import app_logging
 
 
 def main():
+    """Primary method to run transcribe
+    """
     # Set up all arguments
     cmd_args = argparse.ArgumentParser(description='Command Line Arguments for Transcribe',
                                        formatter_class=RawTextHelpFormatter)
@@ -33,7 +35,7 @@ def main():
     cmd_args.add_argument('-m', '--model', action='store', choices=[
         'tiny', 'base', 'small', 'medium', 'large-v1', 'large-v2', 'large'],
         default='tiny',
-        help='Specify the model to use for transcription.'
+        help='Specify the LLM to use for transcription.'
         '\nBy default tiny english model is part of the install.'
         '\ntiny multi-lingual model has to be downloaded from the link   '
         'https://drive.google.com/file/d/1M4AFutTmQROaE9xk2jPc5Y4oFRibHhEh/view?usp=drive_link'
@@ -59,6 +61,10 @@ def main():
     cmd_args.add_argument('-l', '--list_devices', action='store_true',
                           help='List all audio drivers and audio devices on this machine. \
                             \nUse this list index to select the microphone, speaker device for transcription.')
+    cmd_args.add_argument('-mi', '--mic_device_index', action='store', default=None, type=int,
+                          help='Device index of the microphone for capturing sound.')
+    cmd_args.add_argument('-si', '--speaker_device_index', action='store', default=None, type=int,
+                          help='Device index of the speaker for capturing sound.')
     args = cmd_args.parse_args()
 
     # Initiate config
@@ -77,6 +83,14 @@ def main():
 
     # Initiate logging
     log_listener = app_logging.initiate_log(config=config)
+
+    if args.mic_device_index is not None:
+        print('Override default microphone with device specified on command line.')
+        global_vars.user_audio_recorder.set_device(index=args.mic_device_index)
+
+    if args.speaker_device_index is not None:
+        print('Override default speaker with device specified on command line.')
+        global_vars.speaker_audio_recorder.set_device(index=args.speaker_device_index)
 
     try:
         subprocess.run(["ffmpeg", "-version"],
@@ -109,16 +123,14 @@ def main():
     root = ctk.CTk()
     ui_components = ui.create_ui_components(root)
     transcript_textbox = ui_components[0]
-    response_textbox = ui_components[1]
+    global_vars.response_textbox = ui_components[1]
     update_interval_slider = ui_components[2]
     update_interval_slider_label = ui_components[3]
     global_vars.freeze_button = ui_components[4]
     lang_combobox = ui_components[5]
-    filemenu = ui_components[6]
+    global_vars.filemenu = ui_components[6]
     response_now_button = ui_components[7]
 
-    global_vars.filemenu = filemenu
-    global_vars.response_textbox = response_textbox
     global_vars.user_audio_recorder.record_into_queue(global_vars.audio_queue)
 
     time.sleep(2)
@@ -164,8 +176,9 @@ def main():
     lang_combobox.configure(command=model.change_lang)
 
     ui.update_transcript_ui(global_vars.transcriber, transcript_textbox)
-    ui.update_response_ui(global_vars.responder, response_textbox, update_interval_slider_label,
-                          update_interval_slider, global_vars.freeze_state)
+    ui.update_response_ui(global_vars.responder, global_vars.response_textbox,
+                          update_interval_slider_label, update_interval_slider,
+                          global_vars.freeze_state)
 
     root.mainloop()
     log_listener.stop()
