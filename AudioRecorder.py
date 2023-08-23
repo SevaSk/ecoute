@@ -90,6 +90,8 @@ class BaseRecorder:
         self.recorder = sr.Recognizer()
         self.recorder.energy_threshold = ENERGY_THRESHOLD
         self.recorder.dynamic_energy_threshold = DYNAMIC_ENERGY_THRESHOLD
+        # Determines if this device is being used for transcription
+        self.enabled = True
 
         if source is None:
             raise ValueError("audio source can't be None")
@@ -102,6 +104,16 @@ class BaseRecorder:
         """Get the name of this device
         """
 
+    def enable(self):
+        """Enable transcription from this device
+        """
+        self.enabled = True
+
+    def disable(self):
+        """Disable transcription from this device
+        """
+        self.enabled = False
+
     def adjust_for_noise(self, device_name, msg):
         root_logger.info(BaseRecorder.adjust_for_noise.__name__)
         print(f"[INFO] Adjusting for ambient noise from {device_name}. " + msg)
@@ -111,8 +123,9 @@ class BaseRecorder:
 
     def record_into_queue(self, audio_queue):
         def record_callback(_, audio: sr.AudioData) -> None:
-            data = audio.get_raw_data()
-            audio_queue.put((self.source_name, data, datetime.utcnow()))
+            if self.enabled:
+                data = audio.get_raw_data()
+                audio_queue.put((self.source_name, data, datetime.utcnow()))
 
         self.recorder.listen_in_background(self.source, record_callback,
                                            phrase_time_limit=RECORD_TIMEOUT)

@@ -9,6 +9,7 @@ import customtkinter as ctk
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
 import AudioRecorder as ar
+# from audio_player import AudioPlayer
 import TranscriberModels
 import interactions
 import ui
@@ -62,9 +63,15 @@ def main():
                           help='List all audio drivers and audio devices on this machine. \
                             \nUse this list index to select the microphone, speaker device for transcription.')
     cmd_args.add_argument('-mi', '--mic_device_index', action='store', default=None, type=int,
-                          help='Device index of the microphone for capturing sound.')
+                          help='Device index of the microphone for capturing sound.'
+                          '\nDevice index can be obtained using the -l option.')
     cmd_args.add_argument('-si', '--speaker_device_index', action='store', default=None, type=int,
-                          help='Device index of the speaker for capturing sound.')
+                          help='Device index of the speaker for capturing sound.'
+                          '\nDevice index can be obtained using the -l option.')
+    cmd_args.add_argument('-dm', '--disable_mic', action='store_true',
+                          help='Enable transcription from Microphone')
+    cmd_args.add_argument('-ds', '--disable_speaker', action='store_true',
+                          help='Enable transcription from Speaker')
     args = cmd_args.parse_args()
 
     # Initiate config
@@ -91,6 +98,14 @@ def main():
     if args.speaker_device_index is not None:
         print('Override default speaker with device specified on command line.')
         global_vars.speaker_audio_recorder.set_device(index=args.speaker_device_index)
+
+    if args.disable_mic:
+        print('Disabling Microphone')
+        global_vars.user_audio_recorder.disable()
+
+    if args.disable_speaker:
+        print('Disabling Speaker')
+        global_vars.speaker_audio_recorder.disable()
 
     try:
         subprocess.run(["ffmpeg", "-version"],
@@ -144,6 +159,7 @@ def main():
                                                global_vars.speaker_audio_recorder.source,
                                                model,
                                                convo=convo)
+    # global_vars.audio_player = AudioPlayer(convo=convo)
     transcribe_thread = threading.Thread(target=global_vars.transcriber.transcribe_audio_queue,
                                          name='Transcribe',
                                          args=(global_vars.audio_queue,))
@@ -157,6 +173,11 @@ def main():
                                       args=(global_vars.transcriber,))
     respond_thread.daemon = True
     respond_thread.start()
+
+    # audio_response_thread = threading.Thread(target=global_vars.audio_player.play_audio_loop,
+    #                                          name='AudioResponse')
+    # audio_response_thread.daemon = True
+    # audio_response_thread.start()
 
     print("READY")
 

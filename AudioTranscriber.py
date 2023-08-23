@@ -19,7 +19,8 @@ class AudioTranscriber:
         self.transcript_data = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
         self.audio_model = model
-        self.transcribe = True  # By default we start with transcription enabled
+        # Determines if transcription is enabled for the application. By default it is enabled.
+        self.transcribe = True
         self.audio_sources = {
             "You": {
                 "sample_rate": mic_source.SAMPLE_RATE,
@@ -87,8 +88,8 @@ class AudioTranscriber:
             return
         audio_data = sr.AudioData(data, self.audio_sources["You"]["sample_rate"], self.audio_sources["You"]["sample_width"])
         wav_data = io.BytesIO(audio_data.get_wav_data())
-        with open(temp_file_name, 'w+b') as f:
-            f.write(wav_data.read())
+        with open(temp_file_name, 'w+b') as file_handle:
+            file_handle.write(wav_data.read())
 
     def process_speaker_data(self, data, temp_file_name):
         if not self.transcribe:

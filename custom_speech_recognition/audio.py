@@ -12,14 +12,14 @@ import wave
 class AudioData(object):
     """
     Creates a new ``AudioData`` instance, which represents mono audio data.
-
-    The raw audio data is specified by ``frame_data``, which is a sequence of bytes representing audio samples. This is the frame data structure used by the PCM WAV format.
-
-    The width of each sample, in bytes, is specified by ``sample_width``. Each group of ``sample_width`` bytes represents a single audio sample.
-
+    The raw audio data is specified by ``frame_data``, which is a sequence of bytes representing
+    audio samples. This is the frame data structure used by the PCM WAV format.
+    The width of each sample, in bytes, is specified by ``sample_width``. Each group of
+    ``sample_width`` bytes represents a single audio sample.
     The audio data is assumed to have a sample rate of ``sample_rate`` samples per second (Hertz).
-
-    Usually, instances of this class are obtained from ``recognizer_instance.record`` or ``recognizer_instance.listen``, or in the callback for ``recognizer_instance.listen_in_background``, rather than instantiating them directly.
+    Usually, instances of this class are obtained from ``recognizer_instance.record``
+    or ``recognizer_instance.listen``, or in the callback for
+    ``recognizer_instance.listen_in_background``, rather than instantiating them directly.
     """
 
     def __init__(self, frame_data, sample_rate, sample_width):
@@ -33,9 +33,11 @@ class AudioData(object):
 
     def get_segment(self, start_ms=None, end_ms=None):
         """
-        Returns a new ``AudioData`` instance, trimmed to a given time interval. In other words, an ``AudioData`` instance with the same audio data except starting at ``start_ms`` milliseconds in and ending ``end_ms`` milliseconds in.
-
-        If not specified, ``start_ms`` defaults to the beginning of the audio, and ``end_ms`` defaults to the end.
+        Returns a new ``AudioData`` instance, trimmed to a given time interval. In other words,
+        an ``AudioData`` instance with the same audio data except starting at ``start_ms``
+        milliseconds in and ending ``end_ms`` milliseconds in.
+        If not specified, ``start_ms`` defaults to the beginning of the audio, and ``end_ms``
+        defaults to the end.
         """
         assert (
             start_ms is None or start_ms >= 0
@@ -125,8 +127,8 @@ class AudioData(object):
                     raw_data, self.sample_width, convert_width
                 )
 
-        # if the output is 8-bit audio with unsigned samples, convert the samples we've been treating
-        # as signed to unsigned again
+        # if the output is 8-bit audio with unsigned samples, convert the samples
+        # we've been treating as signed to unsigned again
         if convert_width == 1:
             raw_data = audioop.bias(
                 raw_data, 1, 128
@@ -197,7 +199,7 @@ class AudioData(object):
             audioop, "byteswap"
         ):  # ``audioop.byteswap`` was only added in Python 3.4
             raw_data = audioop.byteswap(raw_data, sample_width)
-        else:  
+        else:
             # manually reverse the bytes of each sample, which is slower but
             # works well enough as a fallback
             raw_data = raw_data[sample_width - 1:: -1] + b"".join(

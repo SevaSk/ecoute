@@ -61,10 +61,10 @@ class Conversation:
                        constants.PERSONA_SYSTEM]
 
         combined_transcript = list(merge(
-            self.transcript_data[constants.PERSONA_YOU][-length:],
-            self.transcript_data[constants.PERSONA_SPEAKER][-length:],
-            self.transcript_data[constants.PERSONA_ASSISTANT][-length:],
-            self.transcript_data[constants.PERSONA_SYSTEM][-length:],
+            self.transcript_data[constants.PERSONA_YOU][-length:] if constants.PERSONA_YOU in sources else [],
+            self.transcript_data[constants.PERSONA_SPEAKER][-length:] if constants.PERSONA_SPEAKER in sources else [],
+            self.transcript_data[constants.PERSONA_ASSISTANT][-length:] if constants.PERSONA_ASSISTANT in sources else [],
+            self.transcript_data[constants.PERSONA_SYSTEM][-length:] if constants.PERSONA_SYSTEM in sources else [],
             key=lambda x: x[1]))
         combined_transcript = combined_transcript[-length:]
         return "".join([t[0] for t in combined_transcript])

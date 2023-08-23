@@ -133,7 +133,7 @@ While Transcribe provides real-time transcription and optional response suggesti
 Incorrect API key provided: API_KEY. You can find your API key at https://platform.openai.com/account/api-keys.
 ```
 
-**Models**: The default install of transcribe has the tiny(72 Mb) model. base (138 Mb), small (461 Mb) models can be downloaded and used for transcription by following instructions using transcribe command line. The larger models provide better quality transcription and they have higher memory requirements.
+**Models**: The default install of transcribe has the tiny(72 Mb) model for english. Other larger models and their multi lingual versions can be downloaded and used for transcription by following instructions using transcribe command line arguments. Larger models provide better quality transcription and they have higher memory requirements.
 
 **Language**: If you are not using the --api flag the Whisper model used in Transcribe is set to English. As a result, it may not accurately transcribe non-English languages or dialects. 
 
@@ -143,9 +143,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ➕ Enhancements from base repository ➕
 - Do not need Open AI key, paid Open AI account to use the complete functionality
+- Allow users selective disabling of mic, speaker audio input
 - Allow users to add contextual information to provide customized responses to conversation
 - Allows usage of different models for transcription using command line arguments
 - Allow to pause audio transcription
+- List all active devices on the system
+- Allow user to get response from LLM on demand, even when it is disabled at application level
 - Transcribe audio of any video
 - Preserve all conversation text in UI
 - Allow saving conversation to file
