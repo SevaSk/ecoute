@@ -8,6 +8,7 @@ import time
 import torch
 import sys
 import TranscriberModels
+import subprocess
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
@@ -16,21 +17,18 @@ def write_in_textbox(textbox, text):
 def update_transcript_UI(transcriber, textbox):
     transcript_string = transcriber.get_transcript()
     write_in_textbox(textbox, transcript_string)
-    textbox.after(300, update_transcript_UI, transcriber, textbox)
+    textbox.after(500, update_transcript_UI, transcriber, textbox)
 
 def update_response_UI(responder, textbox, update_interval_slider_label, update_interval_slider, freeze_state):
     if not freeze_state[0]:
         response = responder.response
-
         textbox.configure(state="normal")
         write_in_textbox(textbox, response)
         textbox.configure(state="disabled")
-
         update_interval = int(update_interval_slider.get())
         responder.update_response_interval(update_interval)
         update_interval_slider_label.configure(text=f"Update interval: {update_interval} seconds")
-
-    textbox.after(300, update_response_UI, responder, textbox, update_interval_slider_label, update_interval_slider, freeze_state)
+    textbox.after(500, update_response_UI, responder, textbox, update_interval_slider_label, update_interval_slider, freeze_state)
 
 def clear_context(transcriber, audio_queue):
     transcriber.clear_transcript_data()
@@ -65,6 +63,12 @@ def create_ui_components(root):
     return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
 
 def main():
+    try:
+        subprocess.run(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except FileNotFoundError:
+        print("ERROR: The ffmpeg library is not installed. Please install ffmpeg and try again.")
+        return
+
     root = ctk.CTk()
     transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button = create_ui_components(root)
 
@@ -99,14 +103,14 @@ def main():
     root.grid_columnconfigure(0, weight=2)
     root.grid_columnconfigure(1, weight=1)
 
-     # Add the clear transcript button to the UI
-    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_context(transcriber, audio_queue, ))
+    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_context(transcriber, audio_queue))
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
-    freeze_state = [False]  # Using list to be able to change its content inside inner functions
+    freeze_state = [False]
     def freeze_unfreeze():
-        freeze_state[0] = not freeze_state[0]  # Invert the freeze state
+        freeze_state[0] = not freeze_state[0]
         freeze_button.configure(text="Unfreeze" if freeze_state[0] else "Freeze")
+        response_textbox.configure(state="normal" if freeze_state[0] else "disabled")
 
     freeze_button.configure(command=freeze_unfreeze)
 
@@ -114,7 +118,7 @@ def main():
 
     update_transcript_UI(transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
- 
+
     root.mainloop()
 
 if __name__ == "__main__":
