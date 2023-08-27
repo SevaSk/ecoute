@@ -174,9 +174,7 @@ class MicRecorder(BaseRecorder):
                                )
         self.source = source
         print(f'[INFO] Listening to sound from Microphone: {self.get_name()} ')
-        # This line is commented because in case of non default microphone it can occasionally take
-        # several minutes to execute, thus delaying the start of the application.
-        # self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
+        self.adjust_for_noise("Mic", "Please make some noise from the chosen Mic...")
 
 
 class SpeakerRecorder(BaseRecorder):

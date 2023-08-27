@@ -45,14 +45,27 @@ class ui_callbacks:
             )
 
     def update_response_ui_now(self):
-        """Get response from LLM right away"""
+        """Get response from LLM right away
+        Update the Response UI with the response
+        """
         transcript_string = self.global_vars.transcriber.get_transcript(
             length=constants.MAX_TRANSCRIPTION_PHRASES_FOR_LLM)
 
-        response_string = self.global_vars.responder.generate_response_from_transcript_no_check(transcript_string)
+        response_string = self.global_vars.responder.generate_response_from_transcript_no_check(
+            transcript_string)
         self.global_vars.response_textbox.configure(state="normal")
         write_in_textbox(self.global_vars.response_textbox, response_string)
         self.global_vars.response_textbox.configure(state="disabled")
+
+    def update_response_ui_and_read_now(self):
+        """Get response from LLM right away
+        Update the Response UI with the response
+        Read the response
+        """
+        self.update_response_ui_now()
+
+        # Set event to play the recording audio
+        self.global_vars.audio_player.speech_text_available.set()
 
     def set_transcript_state(self):
         """Enables, disables transcription.
@@ -194,6 +207,9 @@ def create_ui_components(root):
     response_now_button = ctk.CTkButton(root, text="Suggest Response Now", command=None)
     response_now_button.grid(row=2, column=1, padx=10, pady=3, sticky="nsew")
 
+    read_response_now_button = ctk.CTkButton(root, text="Suggest Response and Read", command=None)
+    read_response_now_button.grid(row=3, column=1, padx=10, pady=3, sticky="nsew")
+
     update_interval_slider_label = ctk.CTkLabel(root, text="", font=("Arial", 12),
                                                 text_color="#FFFCF2")
     update_interval_slider_label.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
@@ -210,4 +226,4 @@ def create_ui_components(root):
     # Add new components to the end
     return [transcript_textbox, response_textbox, update_interval_slider,
             update_interval_slider_label, freeze_button, lang_combobox,
-            filemenu, response_now_button]
+            filemenu, response_now_button, read_response_now_button]

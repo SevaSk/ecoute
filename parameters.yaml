@@ -9,6 +9,27 @@ OpenAI:
 # See this link for available models
 # https://platform.openai.com/docs/models/continuous-model-upgrades
   ai_model: gpt-3.5-turbo-0301
+# Language in which ChatGPT should respond.
+# List of languages available for openAI is available at
+# https://platform.openai.com/docs/guides/speech-to-text/supported-languages
+  response_lang: English
+
+  default_prompt_preamble: "You are a casual pal, genuinely interested in the conversation at hand. A poor transcription of conversation is given below."
+  default_prompt_epilogue: "Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+
+# This is the prompt / instruction sent to OpenAI for its responses.
+# See Prompt Engineering for details of this.
+# system_prompt_default, system_prompt, initial_convo are all experimental. Do not use them as yet.
+  system_prompt_default: "You are a casual pal, genuinely interested in the conversation at hand. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+  system_prompt: "You are an expert at Fantasy Football and helping others learn about Fantasy football. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+
+  initial_convo:
+    first:
+      role: "You"
+      content: "I am V, I want to learn about Fantasy Football"
+    second:
+      role: "assistant"
+      content: "Hello, V. That's awesome! What do you want to know about Fantasy Football"
 
 General:
   log_file: 'Transcribe.log'

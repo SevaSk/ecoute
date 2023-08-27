@@ -2,6 +2,7 @@ import queue
 import tkinter as tk
 import customtkinter as ctk
 from AudioTranscriber import AudioTranscriber
+from audio_player import AudioPlayer
 import AudioRecorder
 import Singleton
 import app_logging as al
@@ -17,6 +18,7 @@ class TranscriptionGlobals(Singleton.Singleton):
     audio_queue: queue.Queue = None
     user_audio_recorder: AudioRecorder.MicRecorder = None
     speaker_audio_recorder: AudioRecorder.SpeakerRecorder = None
+    audio_player: AudioPlayer = None
     # Global for transcription from speaker, microphone
     transcriber: AudioTranscriber = None
     # Global for responses from openAI API

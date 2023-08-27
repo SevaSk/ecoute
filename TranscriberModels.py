@@ -73,7 +73,7 @@ class WhisperTranscriber:
 
 class APIWhisperTranscriber:
     def __init__(self):
-        print('Using Open AI API for transcription.')
+        print('[INFO] Using Open AI API for transcription.')
         openai.api_key = GlobalVars.TranscriptionGlobals().api_key
         # lang parameter is not required for API invocation. This exists solely
         # to support --api option from command line.

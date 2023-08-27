@@ -1,14 +1,8 @@
 from heapq import merge
+import datetime
+# import pprint
 import constants
 import configuration
-import datetime
-
-DEFAULT_PREAMBLE = """You are a casual pal, genuinely interested in the conversation at hand.""" \
-                   """Please respond, in detail, to the conversation. Confidently give a """\
-                   """straightforward response to the speaker, even if you don't understand """\
-                   """them. Give your response in square brackets. DO NOT ask to repeat, """\
-                   """and DO NOT ask for clarification. Just answer the speaker directly."""\
-                   """A poor transcription of conversation is given below."""
 
 
 class Conversation:
@@ -21,9 +15,17 @@ class Conversation:
                                 constants.PERSONA_YOU: [],
                                 constants.PERSONA_SPEAKER: [],
                                 constants.PERSONA_ASSISTANT: []}
-        transcript = self.transcript_data[constants.PERSONA_SYSTEM]
-        transcript.append((f"{constants.PERSONA_SYSTEM}: [{DEFAULT_PREAMBLE}]\n\n", datetime.datetime.now()))
         config = configuration.Config().get_data()
+        prompt = config["OpenAI"]["system_prompt"]
+        self.update_conversation(persona=constants.PERSONA_SYSTEM, text=prompt, 
+                                 time_spoken=datetime.datetime.now())
+        initial_convo: dict = config["OpenAI"]["initial_convo"]
+        # Read the initial conversation from parameters.yaml file and add to the convo
+        for _, value in initial_convo.items():
+            role = value['role']
+            content = value['content']
+            self.update_conversation(persona=role, text=content, 
+                                     time_spoken=datetime.datetime.now())
 
     def clear_conversation_data(self):
         """Clear all conversation data
@@ -47,12 +49,12 @@ class Conversation:
 
     def get_conversation(self,
                          sources: list = None,
-                         length: int = 0):
-        """Get the complete transcript
+                         length: int = 0) -> list:
+        """Get the transcript based on specified sources
         Args:
         sources: Get data from which sources (You, Speaker, Assistant, System)
         length: Get the last length elements from the audio transcript.
-                Default value = 0, gives the complete transcript
+                Default value = 0, gives the complete transcript for chosen sources
         """
         if sources is None:
             sources = [constants.PERSONA_YOU,
@@ -72,6 +74,7 @@ class Conversation:
     def get_merged_conversation(self, length: int = 0) -> list:
         """Creates a prompt to be sent to LLM (OpenAI by default)
            length: Get the last length elements from the audio transcript.
+           Initial system prompt is always part of the return value
            Default value = 0, gives the complete transcript
         """
         # print(f'You: Length: {len(self.transcript_data[constants.PERSONA_YOU])}')
@@ -79,12 +82,13 @@ class Conversation:
         # print(f'Assistant: Length: {len(self.transcript_data[constants.PERSONA_ASSISTANT])}')
         # print(f'System: Length: {len(self.transcript_data[constants.PERSONA_SYSTEM])}')
 
+        combined_transcript = self.transcript_data[constants.PERSONA_SYSTEM]
         combined_transcript = list(merge(
+            combined_transcript,
             self.transcript_data[constants.PERSONA_YOU][-length:],
             self.transcript_data[constants.PERSONA_SPEAKER][-length:],
             self.transcript_data[constants.PERSONA_ASSISTANT][-length:],
             key=lambda x: x[1]))
         combined_transcript = combined_transcript[-length:]
 
-        combined_transcript.insert(0, (f"{constants.PERSONA_SYSTEM}: [{self.transcript_data[constants.PERSONA_SYSTEM][0]}]\n\n", datetime.datetime.now()))
         return combined_transcript

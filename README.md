@@ -142,6 +142,7 @@ Incorrect API key provided: API_KEY. You can find your API key at https://platfo
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## ➕ Enhancements from base repository ➕
+- Speech Mode - Read out responses from ChatGPT as Audio
 - Do not need Open AI key, paid Open AI account to use the complete functionality
 - Allow users selective disabling of mic, speaker audio input
 - Allow users to add contextual information to provide customized responses to conversation

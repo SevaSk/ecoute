@@ -11,3 +11,7 @@ pyperclip
 PyYAML
 numpy
 soundfile
+gtts
+# Playsound version 1.3 has issues in playing back audio files
+# in case of continuous play back of files in quick succession
+playsound==1.2.2

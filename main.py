@@ -9,7 +9,7 @@ import customtkinter as ctk
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
 import AudioRecorder as ar
-# from audio_player import AudioPlayer
+from audio_player import AudioPlayer
 import TranscriberModels
 import interactions
 import ui
@@ -92,19 +92,19 @@ def main():
     log_listener = app_logging.initiate_log(config=config)
 
     if args.mic_device_index is not None:
-        print('Override default microphone with device specified on command line.')
+        print('[INFO] Override default microphone with device specified on command line.')
         global_vars.user_audio_recorder.set_device(index=args.mic_device_index)
 
     if args.speaker_device_index is not None:
-        print('Override default speaker with device specified on command line.')
+        print('[INFO] Override default speaker with device specified on command line.')
         global_vars.speaker_audio_recorder.set_device(index=args.speaker_device_index)
 
     if args.disable_mic:
-        print('Disabling Microphone')
+        print('[INFO] Disabling Microphone')
         global_vars.user_audio_recorder.disable()
 
     if args.disable_speaker:
-        print('Disabling Speaker')
+        print('[INFO] Disabling Speaker')
         global_vars.speaker_audio_recorder.disable()
 
     try:
@@ -145,6 +145,7 @@ def main():
     lang_combobox = ui_components[5]
     global_vars.filemenu = ui_components[6]
     response_now_button = ui_components[7]
+    read_response_now_button = ui_components[8]
 
     global_vars.user_audio_recorder.record_into_queue(global_vars.audio_queue)
 
@@ -159,7 +160,7 @@ def main():
                                                global_vars.speaker_audio_recorder.source,
                                                model,
                                                convo=convo)
-    # global_vars.audio_player = AudioPlayer(convo=convo)
+    global_vars.audio_player = AudioPlayer(convo=convo)
     transcribe_thread = threading.Thread(target=global_vars.transcriber.transcribe_audio_queue,
                                          name='Transcribe',
                                          args=(global_vars.audio_queue,))
@@ -174,10 +175,10 @@ def main():
     respond_thread.daemon = True
     respond_thread.start()
 
-    # audio_response_thread = threading.Thread(target=global_vars.audio_player.play_audio_loop,
-    #                                          name='AudioResponse')
-    # audio_response_thread.daemon = True
-    # audio_response_thread.start()
+    audio_response_thread = threading.Thread(target=global_vars.audio_player.play_audio_loop,
+                                             name='AudioResponse')
+    audio_response_thread.daemon = True
+    audio_response_thread.start()
 
     print("READY")
 
@@ -191,6 +192,7 @@ def main():
     ui_cb = ui.ui_callbacks()
     global_vars.freeze_button.configure(command=ui_cb.freeze_unfreeze)
     response_now_button.configure(command=ui_cb.update_response_ui_now)
+    read_response_now_button.configure(command=ui_cb.update_response_ui_and_read_now)
     label_text = f'Update Response interval: {update_interval_slider.get()} seconds'
     update_interval_slider_label.configure(text=label_text)
 

@@ -2,8 +2,8 @@
 """
 
 PERSONA_YOU = 'You'
-PERSONA_ASSISTANT = 'Assistant'
-PERSONA_SYSTEM = 'System'
+PERSONA_ASSISTANT = 'assistant'
+PERSONA_SYSTEM = 'system'
 PERSONA_SPEAKER = 'Speaker'
 
 LOG_NAME = 'Transcribe'
