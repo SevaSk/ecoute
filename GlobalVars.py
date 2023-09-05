@@ -6,6 +6,7 @@ from audio_player import AudioPlayer
 import AudioRecorder
 import Singleton
 import app_logging as al
+import conversation
 
 
 root_logger = al.get_logger()
@@ -29,6 +30,8 @@ class TranscriptionGlobals(Singleton.Singleton):
     api_key: str = None
     filemenu: tk.Menu = None
     response_textbox: ctk.CTkTextbox = None
+
+    convo: conversation.Conversation = None
 
     def __init__(self, key: str = 'API_KEY'):
         root_logger.info(TranscriptionGlobals.__name__)

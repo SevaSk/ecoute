@@ -100,11 +100,11 @@ def main():
         global_vars.speaker_audio_recorder.set_device(index=args.speaker_device_index)
 
     if args.disable_mic:
-        print('[INFO] Disabling Microphone')
+        print('[INFO] Disabling Transcription from the Microphone')
         global_vars.user_audio_recorder.disable()
 
     if args.disable_speaker:
-        print('[INFO] Disabling Speaker')
+        print('[INFO] Disabling Transcription from the speaker')
         global_vars.speaker_audio_recorder.disable()
 
     try:
@@ -153,21 +153,21 @@ def main():
 
     global_vars.speaker_audio_recorder.record_into_queue(global_vars.audio_queue)
     global_vars.freeze_state = [True]
-    convo = conversation.Conversation()
+    global_vars.convo = conversation.Conversation()
 
     # Transcribe and Respond threads, both work on the same instance of the AudioTranscriber class
     global_vars.transcriber = AudioTranscriber(global_vars.user_audio_recorder.source,
                                                global_vars.speaker_audio_recorder.source,
                                                model,
-                                               convo=convo)
-    global_vars.audio_player = AudioPlayer(convo=convo)
+                                               convo=global_vars.convo)
+    global_vars.audio_player = AudioPlayer(convo=global_vars.convo)
     transcribe_thread = threading.Thread(target=global_vars.transcriber.transcribe_audio_queue,
                                          name='Transcribe',
                                          args=(global_vars.audio_queue,))
     transcribe_thread.daemon = True
     transcribe_thread.start()
 
-    global_vars.responder = GPTResponder(convo=convo)
+    global_vars.responder = GPTResponder(convo=global_vars.convo)
 
     respond_thread = threading.Thread(target=global_vars.responder.respond_to_transcriber,
                                       name='Respond',

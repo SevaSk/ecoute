@@ -16,7 +16,15 @@ def create_prompt(transcript):
 {epilogue}'
 
 
-def create_single_turn_prompt_message(transcript: str):
+def create_single_turn_prompt_message(transcript: str) -> list:
+    """Create message list to be sent to LLM.
+       Creates a single item in the list in the format
+            [{
+                role: system
+                content: <Prompt Message>
+            }]
+       The single message contains everything including system prompt and user input
+    """
     config = configuration.Config().get_data()
     response_lang = config["OpenAI"]["response_lang"]
     preamble = config["OpenAI"]["default_prompt_preamble"]
@@ -31,13 +39,31 @@ def create_single_turn_prompt_message(transcript: str):
 
 
 def create_multiturn_prompt(convo: list) -> list:
+    """Create message list to be sent to LLM.
+       Creates multiple items in the list in the format
+            [
+                {
+                    role: system
+                    content: <Prompt Message>
+                }
+                {
+                    role: user
+                    content:<text input from user>
+                }
+                {
+                    role: assistant
+                    content:<Any previous responses from LLM assistant>
+                }
+            ]
+       The single message contains everything including system prompt and user input
+    """
     ret_value = []
 
     for convo_item in convo:
         # Get Persona, text
         convo_persona = convo_item[0][0:convo_item[0].find(':')]
         # print(convo_persona)
-        if convo_persona.lower() == 'you':
+        if convo_persona.lower() == 'you' or convo_persona.lower() == 'speaker':
             convo_persona = 'user'
         convo_content = convo_item[0][convo_item[0].find(':')+1:]
         # strip whitespace in the beginning, end

@@ -45,7 +45,7 @@ class AudioPlayer:
         os.remove(temp_audio_file[1])
 
     def play_audio_loop(self):
-        """Play text to audio continuously based on the signaling of event
+        """Play text to audio based on signaling of event
         """
         while True:
             if self.speech_text_available.is_set():

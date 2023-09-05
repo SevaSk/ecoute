@@ -14,22 +14,31 @@ OpenAI:
 # https://platform.openai.com/docs/guides/speech-to-text/supported-languages
   response_lang: English
 
+# These are used for single turn responses only. These will go away at some point of time
   default_prompt_preamble: "You are a casual pal, genuinely interested in the conversation at hand. A poor transcription of conversation is given below."
-  default_prompt_epilogue: "Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+  default_prompt_epilogue: "Please respond, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
 
-# This is the prompt / instruction sent to OpenAI for its responses.
-# See Prompt Engineering for details of this.
-# system_prompt_default, system_prompt, initial_convo are all experimental. Do not use them as yet.
-  system_prompt_default: "You are a casual pal, genuinely interested in the conversation at hand. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
-  system_prompt: "You are an expert at Fantasy Football and helping others learn about Fantasy football. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+# The combination of system_prompt, initial_convo is used to create a multi turn prompt message for LLM.
+# system_prompt_1, systen_prompt_2 are here as samples of other possible prompts.
+# Only the content of system_prompt parameter will be used
+  system_prompt: "You are an expert at Basketball and helping others learn about basketball. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+  system_prompt_1: "You are a casual pal, genuinely interested in the conversation at hand. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+  system_prompt_2: "You are an expert at Fantasy Football and helping others learn about Fantasy football. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
 
+# When we anticipate to talk about a specific topic, seed the content with some conversation
+# If the conversation is generic, replace this text with something like this.
+#   role: You
+#   content: I am V, I want to have a casual friendly conversation
+#   role: assistant
+#   content: Hello V, That's awesome! Glad to meet you and I am looking forward to our conversation today
   initial_convo:
     first:
       role: "You"
-      content: "I am V, I want to learn about Fantasy Football"
+      # content: "I am V, I want to learn about Fantasy Football"
+      content: "I am V, I want to learn about Basketball"
     second:
       role: "assistant"
-      content: "Hello, V. That's awesome! What do you want to know about Fantasy Football"
+      content: "Hello, V. That's awesome! What do you want to know about basketball"
 
 General:
   log_file: 'Transcribe.log'
