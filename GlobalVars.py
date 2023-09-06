@@ -27,6 +27,7 @@ class TranscriptionGlobals(Singleton.Singleton):
     # Global for determining whether to seek responses from openAI API
     freeze_state: list = None
     freeze_button: ctk.CTkButton = None
+    editmenu: tk.Menu = None
     api_key: str = None
     filemenu: tk.Menu = None
     response_textbox: ctk.CTkTextbox = None
