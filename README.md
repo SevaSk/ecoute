@@ -46,6 +46,8 @@ Please run these commands in a PowerShell window with administrator privileges. 
    pip install -r requirements.txt
    ```
    
+   It is recommended to create a virtual environment for installing the required packages
+   
 4. (Optional) Replace the Open API key in `parameters.yaml` file in the transcribe directory:
 
    Replace the Open API key in `parameters.yaml` file manually. Open in a text editor and alter the line:
@@ -73,7 +75,32 @@ Upon initiation, Transcribe will begin transcribing microphone input and speaker
 
 The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). However, keep in mind, using the Whisper API consumes OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile for your use case.
 
-### 🎬 Running Transcribe
+### 🎬 Customizing Transcribe
+
+By default chatGPT API behaves like a casual friend engaging in light hearted banter. To customize the responses and make it specific to a field see this section in parameters.yaml and the corresponding examples
+
+```
+  system_prompt: "You are a casual pal, genuinely interested in the conversation at hand. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+  system_prompt: "You are an expert at Basketball and helping others learn about basketball. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+  system_prompt: "You are an expert at Fantasy Football and helping others learn about Fantasy football. Please respond, in detail, to the conversation. Confidently give a straightforward response to the speaker, even if you don't understand them. Give your response in square brackets. DO NOT ask to repeat, and DO NOT ask for clarification. Just answer the speaker directly."
+
+
+  initial_convo:
+    first:
+      role: "You"
+      # content: "I am V, I want to learn about Fantasy Football"
+      # content: "I am V, I want to learn about Basketball"
+      content: Hey assistant, how are you doing today, I am in mood of a casual conversation.
+    second:
+      role: "assistant"
+      # content: "Hello, V. That's awesome! What do you want to know about basketball"
+      # content: "Hello, V. That's awesome! What do you want to know about Fantasy Football"
+      content: Hello, V. You are awesome. I am doing very well and looking forward to some light hearted banter with you.
+```
+
+Change system_prompt, intial_convo to be specific to the scenario you are intersted in.
+
+### 🎬 Testing Transcribe Code changes
 
 Unit Tests
 
@@ -123,8 +150,6 @@ https://drive.google.com/file/d/1Iy32YjDXK7Bga7amOUTA4Gx9VEoibPi-/view?usp=shari
 ### ⚡️ Limitations ⚡️
 
 While Transcribe provides real-time transcription and optional response suggestions, there are several known limitations to its functionality that you should be aware of:
-
-**Default Mic and Speaker:** Transcribe is currently configured to listen only to the default microphone and speaker set in your system. It will not detect sound from other devices or systems. To use a different mic or speaker, need to set it as your default device in your system settings.
 
 **Whisper Model**: If the --api flag is not used, we utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
 
