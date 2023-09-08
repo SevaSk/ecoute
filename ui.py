@@ -44,7 +44,7 @@ class ui_callbacks:
         root_logger.info(ui_callbacks.freeze_unfreeze.__name__)
         self.global_vars.freeze_state[0] = not self.global_vars.freeze_state[0]  # Invert the state
         self.global_vars.freeze_button.configure(
-            value="Suggest Responses Continuously" if self.global_vars.freeze_state[0] else "Do Not Suggest Responses Continuously"
+            text="Suggest Responses Continuously" if self.global_vars.freeze_state[0] else "Do Not Suggest Responses Continuously"
             )
 
     # to enable/disable speaker/microphone when args are given or button is pressed
