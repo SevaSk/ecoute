@@ -1,9 +1,9 @@
 import openai
-from keys import OPENAI_API_KEY
+from keys import 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
 from prompts import create_prompt, INITIAL_RESPONSE
 import time
 
-openai.api_key = OPENAI_API_KEY
+openai.api_key = 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
 
 def generate_response_from_transcript(transcript):
     try:
