@@ -1,14 +1,15 @@
 import threading
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
-import customtkinter as ctk
+import customtkinter as ctk  # type: ignore
 import AudioRecorder 
 import queue
 import time
-import torch
+import torch  # type: ignore
 import sys
 import TranscriberModels
 import subprocess
+import os
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
@@ -72,6 +73,12 @@ def main():
         print("ERROR: The ffmpeg library is not installed. Please install ffmpeg and try again.")
         return
 
+    # Check if the API key is set in the environment
+    api_key = os.environ.get('OPENAI_API_KEY')
+    if not api_key:
+        print("ERROR: OPENAI_API_KEY is not set in the environment. Please set it and try again.")
+        return
+
     root = ctk.CTk()
     transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button = create_ui_components(root)
 
@@ -92,7 +99,7 @@ def main():
     transcribe.daemon = True
     transcribe.start()
 
-    responder = GPTResponder()
+    responder = GPTResponder(api_key=api_key)  # Pass the API key from the environment
     respond = threading.Thread(target=responder.respond_to_transcriber, args=(transcriber,))
     respond.daemon = True
     respond.start()

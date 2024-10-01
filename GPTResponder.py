@@ -1,9 +1,6 @@
 import openai
-from keys import OPENAI_API_KEY
 from prompts import create_prompt, INITIAL_RESPONSE
 import time
-
-openai.api_key = OPENAI_API_KEY
 
 def generate_response_from_transcript(transcript):
     try:
@@ -22,9 +19,10 @@ def generate_response_from_transcript(transcript):
         return ''
     
 class GPTResponder:
-    def __init__(self):
+    def __init__(self, api_key):
         self.response = INITIAL_RESPONSE
         self.response_interval = 2
+        openai.api_key = api_key
 
     def respond_to_transcriber(self, transcriber):
         while True:
