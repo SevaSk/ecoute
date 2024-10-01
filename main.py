@@ -1,14 +1,19 @@
 import threading
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
-import customtkinter as ctk
+import customtkinter as ctk  # type: ignore
 import AudioRecorder 
 import queue
 import time
-import torch
+import torch  # type: ignore
 import sys
 import TranscriberModels
 import subprocess
+import os
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def write_in_textbox(textbox, text):
     textbox.delete("0.0", "end")
@@ -37,31 +42,32 @@ def clear_context(transcriber, audio_queue):
     transcriber.clear_transcript_data()
     with audio_queue.mutex:
         audio_queue.queue.clear()
+    logging.info("Transcript and audio queue cleared")
 
 def create_ui_components(root):
-    ctk.set_appearance_mode("dark")
-    ctk.set_default_color_theme("dark-blue")
     root.title("Ecoute")
-    root.configure(bg='#252422')
-    root.geometry("1000x600")
+    root.geometry("800x600")
 
-    font_size = 20
+    # Create transcript textbox
+    transcript_textbox = ctk.CTkTextbox(root, height=200, width=780)
+    transcript_textbox.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
 
-    transcript_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size), text_color='#FFFCF2', wrap="word")
-    transcript_textbox.grid(row=0, column=0, padx=10, pady=20, sticky="nsew")
+    # Create response textbox
+    response_textbox = ctk.CTkTextbox(root, height=200, width=780)
+    response_textbox.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
 
-    response_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size), text_color='#639cdc', wrap="word")
-    response_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="nsew")
+    # Create update interval slider
+    update_interval_slider = ctk.CTkSlider(root, from_=1, to=60, number_of_steps=59)
+    update_interval_slider.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
+    update_interval_slider.set(30)  # Default to 30 seconds
 
-    freeze_button = ctk.CTkButton(root, text="Freeze", command=None)
-    freeze_button.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
+    # Create update interval slider label
+    update_interval_slider_label = ctk.CTkLabel(root, text="Update interval: 30 seconds")
+    update_interval_slider_label.grid(row=4, column=0, columnspan=2, padx=10, pady=5)
 
-    update_interval_slider_label = ctk.CTkLabel(root, text=f"", font=("Arial", 12), text_color="#FFFCF2")
-    update_interval_slider_label.grid(row=2, column=1, padx=10, pady=3, sticky="nsew")
-
-    update_interval_slider = ctk.CTkSlider(root, from_=1, to=10, width=300, height=20, number_of_steps=9)
-    update_interval_slider.set(2)
-    update_interval_slider.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
+    # Create freeze button
+    freeze_button = ctk.CTkButton(root, text="Freeze")
+    freeze_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
     return transcript_textbox, response_textbox, update_interval_slider, update_interval_slider_label, freeze_button
 
@@ -69,7 +75,13 @@ def main():
     try:
         subprocess.run(["ffmpeg", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except FileNotFoundError:
-        print("ERROR: The ffmpeg library is not installed. Please install ffmpeg and try again.")
+        logging.error("The ffmpeg library is not installed. Please install ffmpeg and try again.")
+        return
+
+    # Check if the API key is set in the environment
+    api_key = os.environ.get('OPENAI_API_KEY')
+    if not api_key:
+        logging.error("OPENAI_API_KEY is not set in the environment. Please set it and try again.")
         return
 
     root = ctk.CTk()
@@ -77,48 +89,56 @@ def main():
 
     audio_queue = queue.Queue()
 
+    # Set up microphone recording
     user_audio_recorder = AudioRecorder.DefaultMicRecorder()
     user_audio_recorder.record_into_queue(audio_queue)
+    logging.info("Microphone recording started")
 
     time.sleep(2)
 
+    # Set up speaker recording (for interviewer's voice)
     speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
     speaker_audio_recorder.record_into_queue(audio_queue)
+    logging.info("Speaker recording started")
 
+    # Initialize the transcription model
     model = TranscriberModels.get_model('--api' in sys.argv)
+    logging.info(f"Transcription model initialized: {'API' if '--api' in sys.argv else 'Local'}")
 
-    transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source, model)
+    # Set up audio transcription
+    transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source, model, 
+                                   user_audio_recorder.SAMPLE_RATE, speaker_audio_recorder.sample_rate,
+                                   speaker_audio_recorder.channels)
     transcribe = threading.Thread(target=transcriber.transcribe_audio_queue, args=(audio_queue,))
     transcribe.daemon = True
     transcribe.start()
+    logging.info("Audio transcription thread started")
 
-    responder = GPTResponder()
+    # Set up GPT responder
+    responder = GPTResponder(api_key=api_key)
     respond = threading.Thread(target=responder.respond_to_transcriber, args=(transcriber,))
     respond.daemon = True
     respond.start()
+    logging.info("GPT responder thread started")
 
     print("READY")
+    logging.info("Application ready")
 
-    root.grid_rowconfigure(0, weight=100)
-    root.grid_rowconfigure(1, weight=1)
-    root.grid_rowconfigure(2, weight=1)
-    root.grid_rowconfigure(3, weight=1)
-    root.grid_columnconfigure(0, weight=2)
-    root.grid_columnconfigure(1, weight=1)
-
-     # Add the clear transcript button to the UI
-    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_context(transcriber, audio_queue, ))
+    # Add the clear transcript button to the UI
+    clear_transcript_button = ctk.CTkButton(root, text="Clear Transcript", command=lambda: clear_context(transcriber, audio_queue))
     clear_transcript_button.grid(row=1, column=0, padx=10, pady=3, sticky="nsew")
 
-    freeze_state = [False]  # Using list to be able to change its content inside inner functions
+    freeze_state = [False]
     def freeze_unfreeze():
-        freeze_state[0] = not freeze_state[0]  # Invert the freeze state
+        freeze_state[0] = not freeze_state[0]
         freeze_button.configure(text="Unfreeze" if freeze_state[0] else "Freeze")
+        logging.info(f"Response {'frozen' if freeze_state[0] else 'unfrozen'}")
 
     freeze_button.configure(command=freeze_unfreeze)
 
     update_interval_slider_label.configure(text=f"Update interval: {update_interval_slider.get()} seconds")
 
+    # Start UI update loops
     update_transcript_UI(transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
  
