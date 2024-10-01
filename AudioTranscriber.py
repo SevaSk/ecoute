@@ -1,38 +1,37 @@
-import whisper
+from typing import Dict, List, Tuple, Callable, Any
+import whisper  # type: ignore
 import torch
 import wave
 import os
 import threading
 import tempfile
-import custom_speech_recognition as sr
 import io
-from datetime import timedelta
-import pyaudiowpatch as pyaudio
+from datetime import timedelta, datetime
+import pyaudiowpatch as pyaudio  # type: ignore
 from heapq import merge
 
 PHRASE_TIMEOUT = 3.05
-
 MAX_PHRASES = 10
 
 class AudioTranscriber:
-    def __init__(self, mic_source, speaker_source, model):
-        self.transcript_data = {"You": [], "Speaker": []}
+    def __init__(self, mic_recorder: Any, speaker_recorder: Any, model: Any, mic_sample_rate: int, speaker_sample_rate: int, speaker_channels: int):
+        self.transcript_data: Dict[str, List[Tuple[str, datetime]]] = {"You": [], "Speaker": []}
         self.transcript_changed_event = threading.Event()
         self.audio_model = model
-        self.audio_sources = {
+        self.audio_sources: Dict[str, Dict[str, Any]] = {
             "You": {
-                "sample_rate": mic_source.SAMPLE_RATE,
-                "sample_width": mic_source.SAMPLE_WIDTH,
-                "channels": mic_source.channels,
+                "sample_rate": mic_sample_rate,
+                "sample_width": pyaudio.get_sample_size(pyaudio.paInt16),
+                "channels": 1,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
                 "process_data_func": self.process_mic_data
             },
             "Speaker": {
-                "sample_rate": speaker_source.SAMPLE_RATE,
-                "sample_width": speaker_source.SAMPLE_WIDTH,
-                "channels": speaker_source.channels,
+                "sample_rate": speaker_sample_rate,
+                "sample_width": pyaudio.get_sample_size(pyaudio.paInt16),
+                "channels": speaker_channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
@@ -40,7 +39,7 @@ class AudioTranscriber:
             }
         }
 
-    def transcribe_audio_queue(self, audio_queue):
+    def transcribe_audio_queue(self, audio_queue: Any) -> None:
         while True:
             who_spoke, data, time_spoken = audio_queue.get()
             self.update_last_sample_and_phrase_status(who_spoke, data, time_spoken)
@@ -51,9 +50,9 @@ class AudioTranscriber:
                 fd, path = tempfile.mkstemp(suffix=".wav")
                 os.close(fd)
                 source_info["process_data_func"](source_info["last_sample"], path)
-                text = self.audio_model.get_transcription(path)
+                text = self.audio_model.transcribe(path)['text']
             except Exception as e:
-                print(e)
+                print(f"Transcription error: {e}")
             finally:
                 os.unlink(path)
 
@@ -61,7 +60,7 @@ class AudioTranscriber:
                 self.update_transcript(who_spoke, text, time_spoken)
                 self.transcript_changed_event.set()
 
-    def update_last_sample_and_phrase_status(self, who_spoke, data, time_spoken):
+    def update_last_sample_and_phrase_status(self, who_spoke: str, data: bytes, time_spoken: datetime) -> None:
         source_info = self.audio_sources[who_spoke]
         if source_info["last_spoken"] and time_spoken - source_info["last_spoken"] > timedelta(seconds=PHRASE_TIMEOUT):
             source_info["last_sample"] = bytes()
@@ -72,21 +71,21 @@ class AudioTranscriber:
         source_info["last_sample"] += data
         source_info["last_spoken"] = time_spoken 
 
-    def process_mic_data(self, data, temp_file_name):
-        audio_data = sr.AudioData(data, self.audio_sources["You"]["sample_rate"], self.audio_sources["You"]["sample_width"])
-        wav_data = io.BytesIO(audio_data.get_wav_data())
-        with open(temp_file_name, 'w+b') as f:
-            f.write(wav_data.read())
+    def process_mic_data(self, data: bytes, temp_file_name: str) -> None:
+        with wave.open(temp_file_name, 'wb') as wf:
+            wf.setnchannels(self.audio_sources["You"]["channels"])
+            wf.setsampwidth(self.audio_sources["You"]["sample_width"])
+            wf.setframerate(self.audio_sources["You"]["sample_rate"])
+            wf.writeframes(data)
 
-    def process_speaker_data(self, data, temp_file_name):
+    def process_speaker_data(self, data: bytes, temp_file_name: str) -> None:
         with wave.open(temp_file_name, 'wb') as wf:
             wf.setnchannels(self.audio_sources["Speaker"]["channels"])
-            p = pyaudio.PyAudio()
-            wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
+            wf.setsampwidth(self.audio_sources["Speaker"]["sample_width"])
             wf.setframerate(self.audio_sources["Speaker"]["sample_rate"])
             wf.writeframes(data)
 
-    def update_transcript(self, who_spoke, text, time_spoken):
+    def update_transcript(self, who_spoke: str, text: str, time_spoken: datetime) -> None:
         source_info = self.audio_sources[who_spoke]
         transcript = self.transcript_data[who_spoke]
 
@@ -97,14 +96,14 @@ class AudioTranscriber:
         else:
             transcript[0] = (f"{who_spoke}: [{text}]\n\n", time_spoken)
 
-    def get_transcript(self):
+    def get_transcript(self) -> str:
         combined_transcript = list(merge(
             self.transcript_data["You"], self.transcript_data["Speaker"], 
             key=lambda x: x[1], reverse=True))
         combined_transcript = combined_transcript[:MAX_PHRASES]
         return "".join([t[0] for t in combined_transcript])
     
-    def clear_transcript_data(self):
+    def clear_transcript_data(self) -> None:
         self.transcript_data["You"].clear()
         self.transcript_data["Speaker"].clear()
 

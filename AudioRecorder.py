@@ -18,7 +18,8 @@ class BaseRecorder:
         self.rec = KaldiRecognizer(self.model, SAMPLE_RATE)
         self.p = pyaudio.PyAudio()
         self.stream: Optional[pyaudio.Stream] = None
-        self.source: Any = None  # Added source attribute
+        self.source: Any = None
+        self.SAMPLE_RATE = SAMPLE_RATE  # Expose SAMPLE_RATE as an attribute
 
     def adjust_for_noise(self, device_name: str, msg: str) -> None:
         print(f"[INFO] Adjusting for ambient noise from {device_name}. " + msg)
@@ -32,7 +33,7 @@ class BaseRecorder:
 
         self.stream = self.p.open(format=pyaudio.paInt16,
                                   channels=1,
-                                  rate=SAMPLE_RATE,
+                                  rate=self.SAMPLE_RATE,
                                   input=True,
                                   frames_per_buffer=CHUNK_SIZE,
                                   stream_callback=record_callback)
@@ -49,7 +50,7 @@ class DefaultMicRecorder(BaseRecorder):
         super().__init__(source_name="You")
         self.source = pyaudio.PyAudio().open(format=pyaudio.paInt16,
                                              channels=1,
-                                             rate=SAMPLE_RATE,
+                                             rate=self.SAMPLE_RATE,
                                              input=True,
                                              frames_per_buffer=CHUNK_SIZE)
         self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
