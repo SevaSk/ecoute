@@ -16,6 +16,10 @@ class BaseRecorder:
         self.recorder = sr.Recognizer()
         self.recorder.energy_threshold = ENERGY_THRESHOLD
         self.recorder.dynamic_energy_threshold = DYNAMIC_ENERGY_THRESHOLD
+
+        if source is None:
+            raise ValueError("audio source can't be None")
+
         self.source = source
         self.source_name = source_name
 
