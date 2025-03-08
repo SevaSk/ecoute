@@ -17,12 +17,15 @@ def update_transcript_UI(transcriber, textbox):
     write_in_textbox(textbox, transcript_string)
     textbox.after(300, update_transcript_UI, transcriber, textbox)
 
-def clear_context(transcriber, audio_queue):
+def clear_context(transcriber, speaker_queue, mic_queue):
     transcriber.clear_transcript_data()
-    with audio_queue.mutex:
-        audio_queue.queue.clear()
 
-def create_ui_components(root, transcriber, audio_queue):
+    with speaker_queue.mutex:
+        speaker_queue.queue.clear()
+    with mic_queue.mutex:
+        mic_queue.queue.clear()
+
+def create_ui_components(root, transcriber, speaker_queue, mic_queue):
     ctk.set_appearance_mode("dark")
     ctk.set_default_color_theme("dark-blue")
     root.title("Ecoute")
@@ -49,7 +52,7 @@ def create_ui_components(root, transcriber, audio_queue):
     clear_button = ctk.CTkButton(
         main_frame, 
         text="Clear Transcript", 
-        command=lambda: clear_context(transcriber, audio_queue)
+        command=lambda: clear_context(transcriber, speaker_queue, mic_queue)
     )
     clear_button.grid(row=1, column=0, sticky="ew", padx=10, pady=(0, 10))
 
@@ -63,24 +66,25 @@ def main():
         return
 
     root = ctk.CTk()
-    audio_queue = queue.Queue()
+    speaker_queue = queue.Queue()
+    mic_queue = queue.Queue()
 
     user_audio_recorder = AudioRecorder.DefaultMicRecorder()
-    user_audio_recorder.record_into_queue(audio_queue)
+    user_audio_recorder.record_into_queue(mic_queue)
 
     time.sleep(2)
 
     speaker_audio_recorder = AudioRecorder.DefaultSpeakerRecorder()
-    speaker_audio_recorder.record_into_queue(audio_queue)
+    speaker_audio_recorder.record_into_queue(speaker_queue)
 
     model = TranscriberModels.get_model('--api' in sys.argv)
 
     transcriber = AudioTranscriber(user_audio_recorder.source, speaker_audio_recorder.source, model)
-    transcribe = threading.Thread(target=transcriber.transcribe_audio_queue, args=(audio_queue,))
+    transcribe = threading.Thread(target=transcriber.transcribe_audio_queue, args=(speaker_queue, mic_queue))
     transcribe.daemon = True
     transcribe.start()
 
-    transcript_textbox = create_ui_components(root, transcriber, audio_queue)
+    transcript_textbox = create_ui_components(root, transcriber, speaker_queue, mic_queue)
 
     print("READY")
 
