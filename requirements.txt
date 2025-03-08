@@ -1,8 +1,8 @@
 numpy
-openai-whisper
+faster-whisper
 Wave
-openai==0.27.6
+openai
 customtkinter
 PyAudioWPatch
---extra-index-url https://download.pytorch.org/whl/cu117
-torch
+torch>=2.2.0 --extra-index-url https://download.pytorch.org/whl/cu121 --no-cache-dir
+ctranslate2==3.24.0
