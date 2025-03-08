@@ -1,13 +1,13 @@
 
 # 🎧 Ecoute
 
-Ecoute is a live transcription tool that provides real-time transcripts for both the user's microphone input (You) and the user's speakers output (Speaker) in a textbox. It also generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
+Ecoute is a live transcription tool that provides real-time transcripts for both the user's microphone input (You) and the user's speakers output (Speaker) in a textbox.
 
 ## 📖 Demo
 
 https://github.com/SevaSk/ecoute/assets/50382291/8ac48927-8a26-49fd-80e9-48f980986208
 
-Ecoute is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3.5, Ecoute aims to make communication more efficient and enjoyable.
+Ecoute is designed to help users in their conversations by providing live transcriptions.
 
 ## 🚀 Getting Started
 
@@ -16,7 +16,7 @@ Follow these steps to set up and run Ecoute on your local machine.
 ### 📋 Prerequisites
 
 - Python >=3.8.0
-- An OpenAI API key that can access OpenAI API (set up a paid account OpenAI account)
+- (Optional) An OpenAI API key that can access Whisper API (set up a paid account OpenAI account)
 - Windows OS (Not tested on others)
 - FFmpeg 
 
@@ -52,7 +52,7 @@ Please ensure that you run these commands in a PowerShell window with administra
    pip install -r requirements.txt
    ```
    
-4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
+4. (Optional) Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
 
    - Option 1: You can utilize a command on your command prompt. Run the following command, ensuring to replace "API KEY" with your actual OpenAI API key:
 
@@ -81,7 +81,7 @@ For a more better and faster version that also works with most languages, use:
 python main.py --api
 ```
 
-Upon initiation, Ecoute will begin transcribing your microphone input and speaker output in real-time, generating a suggested response based on the conversation. Please note that it might take a few seconds for the system to warm up before the transcription becomes real-time.
+Upon initiation, Ecoute will begin transcribing your microphone input and speaker output in real-time. Please note that it might take a few seconds for the system to warm up before the transcription becomes real-time.
 
 The --api flag will use the whisper api for transcriptions. This significantly enhances transcription speed and accuracy, and it works in most languages (rather than just English without the flag). It's expected to become the default option in future releases. However, keep in mind that using the Whisper API will consume more OpenAI credits than using the local model. This increased cost is attributed to the advanced features and capabilities that the Whisper API provides. Despite the additional expense, the substantial improvements in speed and transcription accuracy may make it a worthwhile investment for your use case.
 

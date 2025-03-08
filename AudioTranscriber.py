@@ -1,5 +1,3 @@
-import whisper
-import torch
 import wave
 import os
 import threading
