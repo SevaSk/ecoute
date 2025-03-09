@@ -1,13 +1,13 @@
 
 # 🎧 Ecoute
 
-Ecoute is a live transcription tool that provides real-time transcripts for both the user's microphone input (You) and the user's speakers output (Speaker) in a textbox. It also generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
+Ecoute is a live transcription tool that provides real-time transcripts for both the user's microphone input (You) and the user's speakers output (Speaker) in a textbox. It also generates a suggested response using OpenAI's GPT-4o-mini for the user to say based on the live transcription of the conversation.
 
 ## 📖 Demo
 
 https://github.com/SevaSk/ecoute/assets/50382291/8ac48927-8a26-49fd-80e9-48f980986208
 
-Ecoute is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-3.5, Ecoute aims to make communication more efficient and enjoyable.
+Ecoute is designed to help users in their conversations by providing live transcriptions and generating contextually relevant responses. By leveraging the power of OpenAI's GPT-4o-mini, Ecoute aims to make communication more efficient and enjoyable.
 
 ## 🚀 Getting Started
 
@@ -18,7 +18,8 @@ Follow these steps to set up and run Ecoute on your local machine.
 - Python >=3.8.0
 - An OpenAI API key that can access OpenAI API (set up a paid account OpenAI account)
 - Windows OS (Not tested on others)
-- FFmpeg 
+- FFmpeg
+- For GPU acceleration: CUDA-compatible GPU with appropriate drivers (optional but recommended for faster local transcription)
 
 If FFmpeg is not installed in your system, you can follow the steps below to install it.
 
@@ -52,20 +53,22 @@ Please ensure that you run these commands in a PowerShell window with administra
    pip install -r requirements.txt
    ```
    
-4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
+4. Set up your OpenAI API key using one of these methods:
 
-   - Option 1: You can utilize a command on your command prompt. Run the following command, ensuring to replace "API KEY" with your actual OpenAI API key:
+   - Option 1: Create a `keys.py` file in the ecoute directory using a command prompt. Run the following command, replacing "API KEY" with your actual OpenAI API key:
 
       ```
       python -c "with open('keys.py', 'w', encoding='utf-8') as f: f.write('OPENAI_API_KEY=\"API KEY\"')"
       ```
 
-   - Option 2: You can create the keys.py file manually. Open up your text editor of choice and enter the following content:
+   - Option 2: Create the keys.py file manually. Open your text editor and enter the following content:
    
       ```
       OPENAI_API_KEY="API KEY"
       ```
       Replace "API KEY" with your actual OpenAI API key. Save this file as keys.py within the ecoute directory.
+      
+   - Option 3: Set the OPENAI_API_KEY environment variable. The application will automatically use this if no keys.py file is found.
 
 ### 🎬 Running Ecoute
 
@@ -91,7 +94,7 @@ While Ecoute provides real-time transcription and response suggestions, there ar
 
 **Default Mic and Speaker:** Ecoute is currently configured to listen only to the default microphone and speaker set in your system. It will not detect sound from other devices or systems. If you wish to use a different mic or speaker, you will need to set it as your default device in your system settings.
 
-**Whisper Model**: If the --api flag is not used, we utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
+**Whisper Model**: If the --api flag is not used, we utilize the 'tiny' version of the Whisper ASR model, due to its low resource consumption and fast response times. The model now supports GPU acceleration via CUDA for significantly improved performance when a compatible GPU is available. However, this model may not be as accurate as the larger models in transcribing certain types of speech, including accents or uncommon words.
 
 **Language**: If you are not using the --api flag the Whisper model used in Ecoute is set to English. As a result, it may not accurately transcribe non-English languages or dialects. We are actively working to add multi-language support to future versions of the program.
 

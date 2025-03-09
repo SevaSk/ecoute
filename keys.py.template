@@ -1,0 +1,4 @@
+# Rename this file to keys.py and add your OpenAI API key below
+# You can also set the OPENAI_API_KEY environment variable instead
+
+OPENAI_API_KEY = "your-openai-api-key-here"
