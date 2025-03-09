@@ -1,24 +1,36 @@
-import openai
-from keys import OPENAI_API_KEY
+from openai import OpenAI
+import os
 from prompts import create_prompt, INITIAL_RESPONSE
 import time
 
-openai.api_key = OPENAI_API_KEY
+# Get API key from environment variable or keys.py file
+try:
+    from keys import OPENAI_API_KEY
+    client = OpenAI(api_key=OPENAI_API_KEY)
+except ImportError:
+    # Fallback to environment variable
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 def generate_response_from_transcript(transcript):
     try:
-        response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0301",
+        response = client.chat.completions.create(
+                model="gpt-4o-mini",  # Using the latest model
                 messages=[{"role": "system", "content": create_prompt(transcript)}],
-                temperature = 0.0
+                temperature=0.6,
+                max_tokens=500  # Limiting token usage for faster responses
         )
     except Exception as e:
         print(e)
         return ''
     full_response = response.choices[0].message.content
     try:
-        return full_response.split('[')[1].split(']')[0]
-    except:
+        # Extract text between square brackets
+        if '[' in full_response and ']' in full_response:
+            return full_response.split('[')[1].split(']')[0]
+        # Fallback if response doesn't contain square brackets
+        return full_response
+    except Exception as e:
+        print(f"Error parsing response: {e}")
         return ''
     
 class GPTResponder:
