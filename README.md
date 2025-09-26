@@ -5,7 +5,7 @@ Ecoute is a live transcription tool that provides real-time transcripts for both
 
 ## Sponsored By: Recall.ai - Meeting Transcription API
 
-If you’re working with speech detection or transcription for meetings, consider checking out [Recall.ai](https://www.recall.ai/product/meeting-transcription-api/?utm_source=github&utm_medium=sponsorship&utm_campaign=sevask-ecoute), an API that works with Zoom, Google Meet, Microsoft Teams, and more. Recall.ai diarizes by pulling the speaker data and separate audio streams from the meeting platforms, which means 100% accurate speaker diarization with actual speaker names and speaker emails..
+If you’re working with speech detection or transcription for meetings, consider checking out [Recall.ai](https://www.recall.ai/product/meeting-transcription-api/?utm_source=github&utm_medium=sponsorship&utm_campaign=sevask-ecoute), an API that works with Zoom, Google Meet, Microsoft Teams, and more. Recall.ai diarizes by pulling the speaker data and separate audio streams from the meeting platforms, which means 100% accurate speaker diarization with actual speaker names and speaker emails.
 
 ## 📖 Demo
 
