@@ -4,5 +4,5 @@ Wave
 openai
 customtkinter
 PyAudioWPatch
-torch>=2.2.0 --extra-index-url https://download.pytorch.org/whl/cu121 --no-cache-dir
-ctranslate2==3.24.0
+torch>=2.2.0 --extra-index-url https://download.pytorch.org/whl/cu121
+ctranslate2>=4.6.0
