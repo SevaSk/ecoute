@@ -1,5 +1,3 @@
-import whisper
-import torch
 import wave
 import os
 import threading
@@ -11,7 +9,6 @@ import pyaudiowpatch as pyaudio
 from heapq import merge
 
 PHRASE_TIMEOUT = 3.05
-
 MAX_PHRASES = 10
 
 class AudioTranscriber:
@@ -40,26 +37,68 @@ class AudioTranscriber:
             }
         }
 
-    def transcribe_audio_queue(self, audio_queue):
+    def transcribe_audio_queue(self, speaker_queue, mic_queue):
+        import queue
+        
         while True:
-            who_spoke, data, time_spoken = audio_queue.get()
-            self.update_last_sample_and_phrase_status(who_spoke, data, time_spoken)
-            source_info = self.audio_sources[who_spoke]
-
-            text = ''
-            try:
-                fd, path = tempfile.mkstemp(suffix=".wav")
-                os.close(fd)
-                source_info["process_data_func"](source_info["last_sample"], path)
-                text = self.audio_model.get_transcription(path)
-            except Exception as e:
-                print(e)
-            finally:
-                os.unlink(path)
-
-            if text != '' and text.lower() != 'you':
-                self.update_transcript(who_spoke, text, time_spoken)
+            pending_transcriptions = []
+            
+            mic_data = []
+            while True:
+                try:
+                    data, time_spoken = mic_queue.get_nowait()
+                    self.update_last_sample_and_phrase_status("You", data, time_spoken)
+                    mic_data.append((data, time_spoken))
+                except queue.Empty:
+                    break
+                    
+            speaker_data = []
+            while True:
+                try:
+                    data, time_spoken = speaker_queue.get_nowait()
+                    self.update_last_sample_and_phrase_status("Speaker", data, time_spoken)
+                    speaker_data.append((data, time_spoken))
+                except queue.Empty:
+                    break
+            
+            if mic_data:
+                source_info = self.audio_sources["You"]
+                try:
+                    fd, path = tempfile.mkstemp(suffix=".wav")
+                    os.close(fd)
+                    source_info["process_data_func"](source_info["last_sample"], path)
+                    text = self.audio_model.get_transcription(path)
+                    if text != '' and text.lower() != 'you':
+                        latest_time = max(time for _, time in mic_data)
+                        pending_transcriptions.append(("You", text, latest_time))
+                except Exception as e:
+                    print(f"Transcription error for You: {e}")
+                finally:
+                    os.unlink(path)
+            
+            if speaker_data:
+                source_info = self.audio_sources["Speaker"]
+                try:
+                    fd, path = tempfile.mkstemp(suffix=".wav")
+                    os.close(fd)
+                    source_info["process_data_func"](source_info["last_sample"], path)
+                    text = self.audio_model.get_transcription(path)
+                    if text != '' and text.lower() != 'you':
+                        latest_time = max(time for _, time in speaker_data)
+                        pending_transcriptions.append(("Speaker", text, latest_time))
+                except Exception as e:
+                    print(f"Transcription error for Speaker: {e}")
+                finally:
+                    os.unlink(path)
+            
+            if pending_transcriptions:
+                pending_transcriptions.sort(key=lambda x: x[2])
+                for who_spoke, text, time_spoken in pending_transcriptions:
+                    self.update_transcript(who_spoke, text, time_spoken)
+                
                 self.transcript_changed_event.set()
+            
+            threading.Event().wait(0.1)
 
     def update_last_sample_and_phrase_status(self, who_spoke, data, time_spoken):
         source_info = self.audio_sources[who_spoke]
